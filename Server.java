@@ -1,23 +1,37 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 class Server {
 
     public static void main(String[] args) {
+        // Server socket
+        ServerSocket serverSocket = null;
 
         try {
-            // Creates the server socket with SEVER_SOCKET_PORT
-            final ServerSocket serverSocket = new ServerSocket(Configs.SERVER_PORT);
-            // Awaits until client application connects to the server
-            final Socket clientSocket = serverSocket.accept();
-            // Delegates the client connection to the ServerHandler
-            new ServerHandler(clientSocket);
-            // Closes the connection
-            serverSocket.close();
+            // Initiates the server socket with SEVER_SOCKET_PORT
+            serverSocket = new ServerSocket(Configs.SERVER_PORT);
+
+            while (true) {
+                // Awaits until client application connects to the server
+                final Socket clientSocket = serverSocket.accept();
+                // Delegates the client connection to the ServerHandler
+                new ClientHandler(clientSocket);
+            }
+
         } catch (IOException e) {
-            // Prints the stack trace in case of IOException
+            // Handles IO exception
             e.printStackTrace();
+        } finally {
+
+            try {
+                // Closes the connection
+                serverSocket.close();
+            } catch (Exception e) {
+                // Handles any exception
+                e.printStackTrace();
+            }
         }
 
     }

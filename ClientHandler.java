@@ -1,12 +1,13 @@
 import java.io.IOException;
 import java.net.Socket;
 
-class ServerHandler extends Thread {
+class ClientHandler extends Thread {
 
-    private Socket socket;
+    private Socket clientSocket;
 
-    public ServerHandler(Socket socket) {
-        this.socket = socket;
+    public ClientHandler(Socket clientSocket) {
+        super(new BlackjackService(clientSocket));
+        this.clientSocket = clientSocket;
         // Starts the newly-created thread
         start();
     }
@@ -17,7 +18,7 @@ class ServerHandler extends Thread {
         System.out.println("New connection on thread " + this.getName());
 
         try {
-            this.socket.close();
+            this.clientSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
