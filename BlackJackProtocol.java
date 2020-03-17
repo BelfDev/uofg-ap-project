@@ -6,14 +6,15 @@ class BlackJackProtocol implements ApplicationProtocol {
     }
 
     @Override
-    public String processInput(String input) {
+    public Move processInput(Move input) {
         String output;
-        if (input.equals("oi")) {
+        if (input.getCommand().equals("oi")) {
             output = "koeh";
         } else {
             output = "não sei";
         }
-        return output;
+        Move move = new Move(output);
+        return move;
     }
 
 }

@@ -2,14 +2,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
 /**
  * Customized thread dedicated to the game server. This class handles the
- * gathering of client I/O streams and the output of the relevant game state
- * based on the BlackJack protocol.
+ * gathering of client I/O streams and outputs of the relevant game state based
+ * on the BlackJack protocol.
  */
 class GameServerThread extends Thread {
 
@@ -43,29 +45,69 @@ class GameServerThread extends Thread {
         // Opens readers and writers on the client socket's input and output streams
         // The try-with-resources statement takes care of closing resources when
         // necessary
-        try (InputStreamReader reader = new InputStreamReader(inputStream);
-                BufferedReader input = new BufferedReader(reader);
-                // Creates a writer that automatically flushes the output buffer
-                PrintWriter output = new PrintWriter(outputStream, true);) {
-            String inputLine, outputLine;
-            output.println("New client connected at " + this.getName());
+        try ( // Creates an ObjectOutputStream to send data from the server to the client
+                ObjectOutputStream output = new ObjectOutputStream(outputStream);
+                // Creates an ObjectInputStream to retrieve data from the client
+                ObjectInputStream input = new ObjectInputStream(inputStream);) {
+
+            Move inputMove, outputMove;
+            System.out.println("New client connected at " + this.getName());
 
             // Initiates the application communication protocol
             BlackJackProtocol blackJackProtocol = new BlackJackProtocol();
 
-            while ((inputLine = input.readLine()) != null) {
-                outputLine = blackJackProtocol.processInput(inputLine);
-                System.out.println(inputLine);
-                output.println(outputLine);
-                output.println(inputLine);
+            while ((inputMove = (Move) input.readObject()) != null) {
+                outputMove = blackJackProtocol.processInput(inputMove);
+                System.out.println(inputMove);
+                output.writeObject(outputMove);
+                output.flush();
             }
 
             // Closes the client connection
             client.close();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
 
     }
+
+    // @Override
+    // public void run() {
+    // System.out.println("Server thread will run");
+
+    // // Opens readers and writers on the client socket's input and output streams
+    // // The try-with-resources statement takes care of closing resources when
+    // // necessary
+    // try (
+    // // Creates an ObjectInputStream to retrieve data from the client
+    // ObjectInputStream input = new ObjectInputStream(inputStream);
+    // // Creates an ObjectOutputStream to send data from the server to the client
+    // ObjectOutputStream output = new ObjectOutputStream(outputStream);
+    // ) {
+    // System.out.println("Server thread started");
+
+    // Move inputMove, outputMove;
+    // System.out.println("New client connected at " + this.getName());
+
+    // // Initiates the application communication protocol
+    // BlackJackProtocol blackJackProtocol = new BlackJackProtocol();
+
+    // while ((inputMove = (Move) input.readObject()) != null) {
+    // outputMove = blackJackProtocol.processInput(inputMove);
+    // System.out.println(inputMove);
+    // output.writeObject(outputMove);
+    // }
+
+    // // Closes the client connection
+    // client.close();
+    // } catch (IOException e) {
+    // e.printStackTrace();
+    // } catch (ClassNotFoundException e) {
+    // e.printStackTrace();
+    // }
+
+    // }
 
 }

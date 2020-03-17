@@ -1,3 +1,3 @@
 interface ApplicationProtocol {
-    public String processInput(String input);
+    public Move processInput(Move input);
 }
