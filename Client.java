@@ -15,6 +15,11 @@ import java.net.Socket;
 class Client {
 
     public static void main(String[] args) {
+        ClientApp.launch();
+        // connectToServer();
+    }
+
+    private static void connectToServer() {
         Socket server = null;
         try {
             server = new Socket(Configs.SERVER_HOST, Configs.SERVER_PORT);
