@@ -1,39 +1,33 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 
+/**
+ * Server application entry point. Allows multiple client connections and serves
+ * the BlackJack game service.
+ * 
+ * Author: Pedro Henrique Belfort Fernandes 
+ * Matric: 2456943B
+ */
 class Server {
 
     public static void main(String[] args) {
-        // Server socket
-        ServerSocket serverSocket = null;
-
-        try {
-            // Initiates the server socket with SEVER_SOCKET_PORT
-            serverSocket = new ServerSocket(Configs.SERVER_PORT);
-
-            while (true) {
-                // Awaits until client application connects to the server
-                final Socket clientSocket = serverSocket.accept();
-                // Delegates the client connection to the ServerHandler
-                new ClientHandler(clientSocket);
+        // Indicates that the server is open to clients through the SERVER_PORT
+        boolean openToClients = true;
+        // Creates a server socket with SERVER_PORT
+        // The try-with-resources statement automatically closes the socket when
+        // necessary in runtime
+        try (ServerSocket serverSocket = new ServerSocket(Configs.SERVER_PORT)) {
+            while (openToClients) {
+                // Represents a new client connection via Socket
+                Socket clientSocket = serverSocket.accept();
+                // Creates a new GameServerThread passing in the clientSocket connection
+                new GameServerThread(clientSocket);
             }
-
         } catch (IOException e) {
-            // Handles IO exception
+            // In case the SERVER_PORT cannot be read, print the stack trace
             e.printStackTrace();
-        } finally {
-
-            try {
-                // Closes the connection
-                serverSocket.close();
-            } catch (Exception e) {
-                // Handles any exception
-                e.printStackTrace();
-            }
         }
-
     }
 
 }
