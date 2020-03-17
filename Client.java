@@ -6,64 +6,46 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+/**
+ * Client application entry point. Connects to the game Server and allows the
+ * user to play a BlackJack game.
+ */
 class Client {
-
-    private static Socket clientSocket;
 
     public static void main(String[] args) {
 
-        try (
-            Socket clientSocket = new Socket(Configs.SERVER_HOST, Configs.SERVER_PORT);
-
-            InputStream inputStream = clientSocket.getInputStream();
-            OutputStream outputStream = clientSocket.getOutputStream();
-
-            BufferedReader input = new BufferedReader(new InputStreamReader(inputStream));
-            PrintWriter output = new PrintWriter(outputStream, true);
-        ) {
-
+        // Opens a socket that is connected to the Server on SERVER_HOST and SERVER_PORT
+        try (Socket clientSocket = new Socket(Configs.SERVER_HOST, Configs.SERVER_PORT);
+                // Gets the I/O streams of the connection
+                InputStream inputStream = clientSocket.getInputStream();
+                OutputStream outputStream = clientSocket.getOutputStream();
+                // Turns the I/O streams into a reader and a writer
+                BufferedReader input = new BufferedReader(new InputStreamReader(inputStream));
+                PrintWriter output = new PrintWriter(outputStream, true);) {
+            // Retrieves input from the client user
             BufferedReader clientInput = new BufferedReader(new InputStreamReader(System.in));
             String fromClient, fromServer;
 
+            // Awaits incoming data from the server
             while ((fromServer = input.readLine()) != null) {
+                // Sends the user input to the server
                 System.out.println("Server: " + fromServer);
-
+                // Retrieves user input
                 fromClient = clientInput.readLine();
+                // Sends user input to the server
                 if (fromClient != null) {
                     System.out.println("Client: " + fromClient);
                     output.println(fromClient);
                 }
             }
 
+            clientInput.close();
+
         } catch (IOException e) {
+            System.out.println("Server Terminated");
             e.printStackTrace();
         }
 
     }
-
-    // public static void main(String[] args) {
-    //     try {
-    //         clientSocket = new Socket(Configs.SERVER_ADDRESS, Configs.SERVER_PORT);
-    //         Thread readerThread = new Thread(new Reader(clientSocket));
-    //         Thread writerThread = new Thread(new Writer(clientSocket));
-
-    //         readerThread.start();
-    //         writerThread.start();
-    //         readerThread.join();
-    //         writerThread.join();
-
-    //     } catch (InterruptedException e) {
-    //         e.printStackTrace();
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     } finally {
-    //         try {
-    //             clientSocket.close();
-    //         } catch (IOException e) {
-    //             e.printStackTrace();
-    //         }
-    //     }
-
-    // }
 
 }

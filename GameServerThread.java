@@ -50,12 +50,17 @@ class GameServerThread extends Thread {
             String inputLine, outputLine;
             output.println("New client connected at " + this.getName());
 
+            // Initiates the application communication protocol
+            BlackJackProtocol blackJackProtocol = new BlackJackProtocol();
+
             while ((inputLine = input.readLine()) != null) {
-                outputLine = "Test";
+                outputLine = blackJackProtocol.processInput(inputLine);
                 System.out.println(inputLine);
                 output.println(outputLine);
                 output.println(inputLine);
             }
+
+            // Closes the client connection
             client.close();
         } catch (IOException e) {
             e.printStackTrace();
