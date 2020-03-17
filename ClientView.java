@@ -1,5 +1,8 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 class ClientView extends JFrame {
 
@@ -25,15 +28,16 @@ class ClientView extends JFrame {
 
     private void setupPanels() {
         this.topBar = new JPanel();
-        this.mainContent = new JPanel();
+        this.mainContent = new BJTableView();
         this.bottomBar = new JPanel();
 
         topBar.setBackground(Color.blue);
-        mainContent.setBackground(Color.red);
         bottomBar.setBackground(Color.green);
 
         this.add(topBar, BorderLayout.NORTH);
         this.add(mainContent, BorderLayout.CENTER);
         this.add(bottomBar, BorderLayout.SOUTH);
     }
+
+   
 }
