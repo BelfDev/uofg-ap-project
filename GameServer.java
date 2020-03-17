@@ -1,16 +1,21 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * This class starts the game server by creating a new ServerSocket and
  * listening for multiple client connections. Once a client connects, it serves
  * the BlackJackService.
  */
-class GameServer implements Runnable {
+class GameServer implements Runnable, Observer {
 
     // Indicates that the server is open for clients through the SERVER_PORT
     private boolean openToClients = true;
+
+    private ArrayList<BlackJackService> services = new ArrayList<>();
 
     @Override
     public void run() {
@@ -23,9 +28,11 @@ class GameServer implements Runnable {
                 Socket clientSocket = serverSocket.accept();
                 // Creates a new black jack service
                 BlackJackService blackJackService = new BlackJackService(clientSocket);
+                blackJackService.addObserver(this);
+                services.add(blackJackService);
                 // Creates a new black jack service Thread
                 Thread blackJackServiceThread = new Thread(blackJackService);
-                
+
                 System.out.println("New client connected at " + blackJackServiceThread.getName());
                 // Starts the black jack service thread thread execution
                 blackJackServiceThread.start();
@@ -33,6 +40,17 @@ class GameServer implements Runnable {
         } catch (IOException e) {
             // In case the SERVER_PORT cannot be read, print the stack trace
             e.printStackTrace();
+        }
+
+    }
+
+    @Override
+	public void update(Observable o, Object arg) {
+        Move m = (Move) arg;
+        for (BlackJackService service : services) {
+            if (service != null) {
+                service.transmitMessage(m);
+            }
         }
     }
 
