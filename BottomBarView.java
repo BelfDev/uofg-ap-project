@@ -7,17 +7,17 @@ class BottomBarView extends JPanel {
 
     private static final String INSTRUCTION_LABEL_TEXT = "Click on the chip to bet";
 
-    public JButton yellowChipButton;
-    public JButton redChipButton;
-    public JButton greenChipButton;
-    public JButton blueChipButton;
+    private JButton yellowChipButton;
+    private JButton redChipButton;
+    private JButton greenChipButton;
+    private JButton blueChipButton;
 
-    public JButton dealButton;
-    public JButton standButton;
-    public JButton doubleButton;
-    public JButton splitButton;
+    private JButton dealButton;
+    private JButton standButton;
+    private JButton doubleButton;
+    private JButton splitButton;
 
-    public JButton quitButton;
+    private JButton quitButton;
 
     public BottomBarView() {
         // Sets the bottom bar height
@@ -30,6 +30,44 @@ class BottomBarView extends JPanel {
         this.setBorder(BorderFactory.createMatteBorder(Configs.BAR_BORDER_SIZE, 0, 0, 0, Configs.BOTTOM_BAR_TOP_BORDER_COLOR));
         // Adds content panels
         addPanels();
+    }
+
+    // Getters
+
+    public JButton getYellowChipButton() {
+        return yellowChipButton;
+    }
+
+    public JButton getRedChipButton() {
+        return redChipButton;
+    }
+
+    public JButton getGreenChipButton() {
+        return greenChipButton;
+    }
+
+    public JButton getBlueChipButton() {
+        return blueChipButton;
+    }
+
+    public JButton getDealButton() {
+        return dealButton;
+    }
+
+    public JButton getStandButton() {
+        return standButton;
+    }
+
+    public JButton getDoubleButton() {
+        return doubleButton;
+    }
+
+    public JButton getSplitButton() {
+        return splitButton;
+    }
+
+    public JButton getQuitButton() {
+        return quitButton;
     }
 
     // Root container setup
