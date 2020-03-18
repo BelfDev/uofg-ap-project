@@ -1,6 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * This class encapsulates the content of the BottomBarView.
+ * It provides the player with game controls to bet chips and
+ * take game play actions such as DEAL, STAND, DOUBLE, and SPLIT.
+ * It also enables the player to QUIT the game.
+ */
 class BottomBarView extends JPanel {
 
     private static final String INSTRUCTION_LABEL_TEXT = "Click on the chip to bet";

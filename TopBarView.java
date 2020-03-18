@@ -1,6 +1,11 @@
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * This class encapsulates the content of the TopBarView.
+ * It provides visual feedback on the player's current credit
+ * balance, game play status, and number of players in the table.
+ */
 class TopBarView extends JPanel {
 
     private JLabel balanceValueLabel;
