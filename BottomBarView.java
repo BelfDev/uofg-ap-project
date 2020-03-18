@@ -12,6 +12,13 @@ class BottomBarView extends JPanel {
     public JButton greenChipButton;
     public JButton blueChipButton;
 
+    public JButton dealButton;
+    public JButton standButton;
+    public JButton doubleButton;
+    public JButton splitButton;
+
+    public JButton quitButton;
+
     public BottomBarView() {
         // Sets the bottom bar height
         Dimension size = new Dimension(0, Configs.BOTTOM_BAR_HEIGHT);
@@ -21,9 +28,11 @@ class BottomBarView extends JPanel {
         this.setLayout(boxLayout);
         // Sets the bottom bar top border
         this.setBorder(BorderFactory.createMatteBorder(Configs.BAR_BORDER_SIZE, 0, 0, 0, Configs.BOTTOM_BAR_TOP_BORDER_COLOR));
-
-        setupPanels();
+        // Adds content panels
+        addPanels();
     }
+
+    // Root container setup
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -40,24 +49,39 @@ class BottomBarView extends JPanel {
         g2d.fillRect(0, 0, getWidth(), getHeight());
     }
 
-    private void setupPanels() {
-        JPanel betPanel = createBetPanel();
-        JPanel actionPanel = createActionPanel();
-        JPanel gameOptionsPanel = new JPanel();
+    private void addPanels() {
+        add(createBetPanel());
+        add(createActionPanel());
+        add(createOptionsPanel());
+    }
 
-        gameOptionsPanel.setBackground(Color.yellow);
-        gameOptionsPanel.add(new JLabel("This is a test"));
+    // Content panel creation
 
-        add(betPanel);
-        add(actionPanel);
-        add(gameOptionsPanel);
+    private JPanel createOptionsPanel() {
+        // Creates the container panel
+        JPanel container = new JPanel();
+        container.setLayout(new GridBagLayout());
+        container.setOpaque(false);
+
+        // Creates and customizes the quit button
+        quitButton = new JButton("QUIT GAME");
+        Dimension buttonSize = new Dimension(160, 48);
+        quitButton.setMaximumSize(buttonSize);
+        quitButton.setPreferredSize(buttonSize);
+        Font customizedFont = getBoldFont(quitButton.getFont());
+        quitButton.setFont(customizedFont);
+        quitButton.setForeground(Color.red);
+
+        container.add(quitButton);
+
+        return container;
     }
 
     private JPanel createActionPanel() {
         // Creates the container panel
         JPanel container = new JPanel();
         container.setLayout(new GridBagLayout());
-        container.setBorder(BorderFactory.createMatteBorder(0, 8, 0,8, Configs.BOTTOM_BAR_TOP_BORDER_COLOR));
+        container.setBorder(BorderFactory.createMatteBorder(0, 8, 0, 8, Configs.BOTTOM_BAR_TOP_BORDER_COLOR));
         container.setOpaque(false);
 
         // Creates the buttons container panel
@@ -66,19 +90,19 @@ class BottomBarView extends JPanel {
         buttonsContainer.setOpaque(false);
 
         // Creates the action buttons
-        JButton button1 = createActionButton("DEAL");
-        JButton button2 = createActionButton("STAND");
-        JButton button3 = createActionButton("DOUBLE");
-        JButton button4 = createActionButton("SPLIT");
+        dealButton = createActionButton("DEAL");
+        standButton = createActionButton("STAND");
+        doubleButton = createActionButton("DOUBLE");
+        splitButton = createActionButton("SPLIT");
 
         final int buttonMargin = 16;
-        buttonsContainer.add(button1);
+        buttonsContainer.add(dealButton);
         buttonsContainer.add(Box.createHorizontalStrut(buttonMargin));
-        buttonsContainer.add(button2);
+        buttonsContainer.add(standButton);
         buttonsContainer.add(Box.createHorizontalStrut(buttonMargin));
-        buttonsContainer.add(button3);
+        buttonsContainer.add(doubleButton);
         buttonsContainer.add(Box.createHorizontalStrut(buttonMargin));
-        buttonsContainer.add(button4);
+        buttonsContainer.add(splitButton);
 
         container.add(buttonsContainer);
 
@@ -96,8 +120,8 @@ class BottomBarView extends JPanel {
         JPanel instructionPanel = new JPanel();
         JLabel instructionLabel = new JLabel(INSTRUCTION_LABEL_TEXT);
         instructionLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        Font f = instructionLabel.getFont();
-        instructionLabel.setFont(new Font(f.getName(), Font.BOLD, 16));
+        Font customizedFont = getBoldFont(instructionLabel.getFont());
+        instructionLabel.setFont(customizedFont);
         instructionLabel.setForeground(Color.white);
         instructionPanel.add(instructionLabel);
 
@@ -132,9 +156,9 @@ class BottomBarView extends JPanel {
         Dimension buttonSize = new Dimension(100, 100);
         button.setMaximumSize(buttonSize);
         button.setPreferredSize(buttonSize);
-        button.setBackground(Configs.BOTTOM_BAR_TOP_BORDER_COLOR);
+        Font customizedFont = getBoldFont(button.getFont());
+        button.setFont(customizedFont);
         button.setForeground(Configs.BOTTOM_BAR_TOP_BORDER_COLOR);
-        button.setOpaque(true);
         return button;
     }
 
@@ -149,6 +173,8 @@ class BottomBarView extends JPanel {
         return button;
     }
 
+    // Convenience methods
+
     private Image loadImage(String fileName) {
         try {
             return ImageIO.read(new File(fileName));
@@ -156,6 +182,10 @@ class BottomBarView extends JPanel {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private Font getBoldFont(Font currentFont) {
+        return new Font(currentFont.getName(), Font.BOLD, Configs.BUTTON_FONT_SIZE);
     }
 
 }

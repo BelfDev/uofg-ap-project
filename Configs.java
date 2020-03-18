@@ -20,7 +20,8 @@ class Configs {
     public static final Color TOP_BAR_BOTTOM_BORDER_COLOR = new Color(18, 18, 14);
 
     // - Bottom bar
-    public static final int BOTTOM_BAR_HEIGHT = 140 + BAR_BORDER_SIZE;
+    public static final int BOTTOM_BAR_HEIGHT = 128 + BAR_BORDER_SIZE;
+    public static final int BUTTON_FONT_SIZE = 16;
     public static final Color BOTTOM_BAR_INITIAL_GRADIENT_COLOR = new Color(151, 44, 0);
     public static final Color BOTTOM_BAR_FINAL_GRADIENT_COLOR = new Color(167, 62, 0);
     public static final Color BOTTOM_BAR_TOP_BORDER_COLOR = new Color(117, 28, 0);
