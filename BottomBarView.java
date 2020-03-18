@@ -42,15 +42,47 @@ class BottomBarView extends JPanel {
 
     private void setupPanels() {
         JPanel betPanel = createBetPanel();
-        JPanel actionPanel = new JPanel();
+        JPanel actionPanel = createActionPanel();
         JPanel gameOptionsPanel = new JPanel();
 
-        actionPanel.setBackground(Color.red);
         gameOptionsPanel.setBackground(Color.yellow);
+        gameOptionsPanel.add(new JLabel("This is a test"));
 
         add(betPanel);
         add(actionPanel);
         add(gameOptionsPanel);
+    }
+
+    private JPanel createActionPanel() {
+        // Creates the container panel
+        JPanel container = new JPanel();
+        container.setLayout(new GridBagLayout());
+        container.setBorder(BorderFactory.createMatteBorder(0, 8, 0,8, Configs.BOTTOM_BAR_TOP_BORDER_COLOR));
+        container.setOpaque(false);
+
+        // Creates the buttons container panel
+        JPanel buttonsContainer = new JPanel();
+        buttonsContainer.setLayout(new BoxLayout(buttonsContainer, BoxLayout.X_AXIS));
+        buttonsContainer.setOpaque(false);
+
+        // Creates the action buttons
+        JButton button1 = createActionButton("DEAL");
+        JButton button2 = createActionButton("STAND");
+        JButton button3 = createActionButton("DOUBLE");
+        JButton button4 = createActionButton("SPLIT");
+
+        final int buttonMargin = 16;
+        buttonsContainer.add(button1);
+        buttonsContainer.add(Box.createHorizontalStrut(buttonMargin));
+        buttonsContainer.add(button2);
+        buttonsContainer.add(Box.createHorizontalStrut(buttonMargin));
+        buttonsContainer.add(button3);
+        buttonsContainer.add(Box.createHorizontalStrut(buttonMargin));
+        buttonsContainer.add(button4);
+
+        container.add(buttonsContainer);
+
+        return container;
     }
 
     private JPanel createBetPanel() {
@@ -93,6 +125,17 @@ class BottomBarView extends JPanel {
         container.add(Box.createVerticalGlue());
 
         return container;
+    }
+
+    private JButton createActionButton(String title) {
+        JButton button = new JButton(title);
+        Dimension buttonSize = new Dimension(100, 100);
+        button.setMaximumSize(buttonSize);
+        button.setPreferredSize(buttonSize);
+        button.setBackground(Configs.BOTTOM_BAR_TOP_BORDER_COLOR);
+        button.setForeground(Configs.BOTTOM_BAR_TOP_BORDER_COLOR);
+        button.setOpaque(true);
+        return button;
     }
 
     private JButton createIconButton(String fileName) {
