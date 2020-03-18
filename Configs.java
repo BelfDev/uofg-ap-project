@@ -27,6 +27,9 @@ class Configs {
     public static final Color BOTTOM_BAR_FINAL_GRADIENT_COLOR = new Color(167, 62, 0);
     public static final Color BOTTOM_BAR_TOP_BORDER_COLOR = new Color(117, 28, 0);
 
+    // Player view
+    public static final Dimension CARD_SIZE = new Dimension(60, 90);
+
     private Configs() {
     }
 }
