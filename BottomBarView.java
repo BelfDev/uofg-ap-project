@@ -1,7 +1,5 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 
 class BottomBarView extends JPanel {
 
@@ -106,7 +104,7 @@ class BottomBarView extends JPanel {
         Dimension buttonSize = new Dimension(160, 48);
         quitButton.setMaximumSize(buttonSize);
         quitButton.setPreferredSize(buttonSize);
-        Font customizedFont = getBoldFont(quitButton.getFont());
+        Font customizedFont = Utils.getBoldFont(quitButton.getFont(), Configs.BUTTON_FONT_SIZE);
         quitButton.setFont(customizedFont);
         quitButton.setForeground(Color.red);
 
@@ -158,7 +156,7 @@ class BottomBarView extends JPanel {
         JPanel instructionPanel = new JPanel();
         JLabel instructionLabel = new JLabel(INSTRUCTION_LABEL_TEXT);
         instructionLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        Font customizedFont = getBoldFont(instructionLabel.getFont());
+        Font customizedFont = Utils.getBoldFont(instructionLabel.getFont(), Configs.BUTTON_FONT_SIZE);
         instructionLabel.setFont(customizedFont);
         instructionLabel.setForeground(Color.white);
         instructionPanel.add(instructionLabel);
@@ -194,7 +192,7 @@ class BottomBarView extends JPanel {
         Dimension buttonSize = new Dimension(100, 100);
         button.setMaximumSize(buttonSize);
         button.setPreferredSize(buttonSize);
-        Font customizedFont = getBoldFont(button.getFont());
+        Font customizedFont = Utils.getBoldFont(button.getFont(), Configs.BUTTON_FONT_SIZE);
         button.setFont(customizedFont);
         button.setForeground(Configs.BOTTOM_BAR_TOP_BORDER_COLOR);
         return button;
@@ -202,28 +200,13 @@ class BottomBarView extends JPanel {
 
     private JButton createIconButton(String fileName) {
         JButton button = new JButton();
-        Image image = loadImage(fileName);
+        Image image = Utils.loadImage(fileName);
         assert image != null;
         button.setIcon(new ImageIcon(image));
         button.setOpaque(false);
         button.setContentAreaFilled(false);
         button.setBorderPainted(false);
         return button;
-    }
-
-    // Convenience methods
-
-    private Image loadImage(String fileName) {
-        try {
-            return ImageIO.read(new File(fileName));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private Font getBoldFont(Font currentFont) {
-        return new Font(currentFont.getName(), Font.BOLD, Configs.BUTTON_FONT_SIZE);
     }
 
 }

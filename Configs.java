@@ -16,8 +16,9 @@ class Configs {
 
     // - Top bar
     public static final int TOP_BAR_HEIGHT = 40 + BAR_BORDER_SIZE;
+    public static final int TOP_BAR_STATIC_LABEL_FONT_SIZE = 10;
     public static final Color TOP_BAR_COLOR = new Color(31, 31, 29);
-    public static final Color TOP_BAR_BOTTOM_BORDER_COLOR = new Color(18, 18, 14);
+    public static final Color TOP_BAR_BORDER_COLOR = new Color(18, 18, 14);
 
     // - Bottom bar
     public static final int BOTTOM_BAR_HEIGHT = 128 + BAR_BORDER_SIZE;
