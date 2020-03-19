@@ -9,6 +9,10 @@ class BJTableView extends JPanel {
         backgroundImage = Utils.loadImage("bj-table.png");
         this.setLayout(null);
 
+        DealerView dealer = new DealerView();
+
+        dealer.setLocation(308, 100);
+
         PlayerView p1 = new PlayerView();
         PlayerView p2 = new PlayerView();
         PlayerView p3 = new PlayerView();
@@ -22,6 +26,7 @@ class BJTableView extends JPanel {
         p5.setLocation(1038, 240);
 
 
+        add(dealer);
         add(p1);
         add(p2);
         add(p3);

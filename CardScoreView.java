@@ -2,22 +2,25 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * This class represents the playing card.
+ * This class provides a visual representation of
+ * the sum of the card scores.
  */
-public class CardView extends JLabel {
+public class CardScoreView extends JLabel {
 
     private static final int BORDER_RADIUS = 8;
 
-    private Image backgroundImage;
-
     /**
-     * Constructs a card view with the given image name.
+     * Constructs a card score view with the given size.
+     *
+     * @param size the dimension of the score view.
      */
-    public CardView(String imageName) {
-        backgroundImage = Utils.loadImage(String.format("%s.png", imageName));
-        this.setSize(Configs.CARD_SIZE);
-        this.setPreferredSize(Configs.CARD_SIZE);
-        this.setMaximumSize(Configs.CARD_SIZE);
+    public CardScoreView(Dimension size) {
+        // Customizes the view
+        this.setSize(size);
+        this.setPreferredSize(size);
+        this.setMaximumSize(size);
+        this.setHorizontalAlignment(JLabel.CENTER);
+        this.setVerticalAlignment(JLabel.CENTER);
     }
 
     @Override
@@ -27,10 +30,10 @@ public class CardView extends JLabel {
         int height = getHeight();
         Graphics2D graphics = (Graphics2D) g;
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        // Sets background color
+        graphics.setColor(getBackground());
         // Ensure rounded background
         graphics.fillRoundRect(0, 0, width - 1, height - 1, arcs.width, arcs.height);
-        // Apply card image
-        g.drawImage(backgroundImage, 0, 0, width, height, this);
         // Paint border
         graphics.setColor(getForeground());
         graphics.drawRoundRect(0, 0, width - 1, height - 1, arcs.width, arcs.height); //paint border

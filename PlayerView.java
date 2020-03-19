@@ -59,15 +59,15 @@ public class PlayerView extends JPanel {
         cardsContainer.setSize(Configs.CARD_SIZE.width + SCORE_LABEL_SIZE + SCORE_LABEL_LEFT_MARGIN, Configs.CARD_SIZE.height);
         cardsContainer.setOpaque(false);
 
-        scoreLabel = createScoreLabel();
+        scoreLabel = new CardScoreView(new Dimension(SCORE_LABEL_SIZE, SCORE_LABEL_SIZE));
         scoreLabel.setText("2");
         scoreLabel.setLocation(cardsContainer.getWidth() - SCORE_LABEL_SIZE, 0);
 
-        addCard(new CardView());
-        addCard(new CardView());
-        addCard(new CardView());
-        addCard(new CardView());
-        addCard(new CardView());
+        addCard(new CardView("card_2_c_ic"));
+        addCard(new CardView("card_2_c_ic"));
+        addCard(new CardView("card_2_c_ic"));
+        addCard(new CardView("card_2_c_ic"));
+        addCard(new CardView("card_2_c_ic"));
 
         cardsContainer.add(scoreLabel);
 
@@ -91,32 +91,5 @@ public class PlayerView extends JPanel {
         cardsContainer.setComponentZOrder(card, 0);
         cardsCounter++;
     }
-
-    private JLabel createScoreLabel() {
-        JLabel label = new JLabel() {
-
-            @Override
-            protected void paintComponent(Graphics g) {
-                Dimension arcs = new Dimension(8, 8);
-                int width = getWidth();
-                int height = getHeight();
-                Graphics2D graphics = (Graphics2D) g;
-                graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                // Sets background color
-                graphics.setColor(getBackground());
-                // Ensure rounded background
-                graphics.fillRoundRect(0, 0, width - 1, height - 1, arcs.width, arcs.height);
-                // Paint border
-                graphics.setColor(getForeground());
-                graphics.drawRoundRect(0, 0, width - 1, height - 1, arcs.width, arcs.height); //paint border
-                super.paintComponent(g);
-            }
-        };
-        label.setSize(SCORE_LABEL_SIZE, SCORE_LABEL_SIZE);
-        label.setHorizontalAlignment(JLabel.CENTER);
-        label.setVerticalAlignment(JLabel.CENTER);
-        return label;
-    }
-
 
 }
