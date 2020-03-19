@@ -173,10 +173,10 @@ class BottomBarView extends JPanel {
         chipPanel.setOpaque(false);
 
         // Creates the chip buttons
-        yellowChipButton = createIconButton("yellow_chip_ic.png");
-        redChipButton = createIconButton("red_chip_ic.png");
-        greenChipButton = createIconButton("green_chip_ic.png");
-        blueChipButton = createIconButton("blue_chip_ic.png");
+        yellowChipButton = createIconButton("assets/yellow_chip_ic.png");
+        redChipButton = createIconButton("assets/red_chip_ic.png");
+        greenChipButton = createIconButton("assets/green_chip_ic.png");
+        blueChipButton = createIconButton("assets/blue_chip_ic.png");
 
         chipPanel.add(yellowChipButton);
         chipPanel.add(redChipButton);

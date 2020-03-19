@@ -6,7 +6,7 @@ class BJTableView extends JPanel {
     private Image backgroundImage;
 
     public BJTableView() {
-        backgroundImage = Utils.loadImage("bj-table.png");
+        backgroundImage = Utils.loadImage("assets/bj-table.png");
         this.setLayout(null);
 
         DealerView dealer = new DealerView();

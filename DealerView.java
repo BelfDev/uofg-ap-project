@@ -27,11 +27,10 @@ public class DealerView extends JPanel {
         cardsContainer = createCardsContainer();
         JPanel scoreContainer = createScoreContainer();
 
-        addCard(new CardView("card_2_c_ic"));
-        addCard(new CardView("card_2_c_ic"));
-        addCard(new CardView("card_2_c_ic"));
-        addCard(new CardView("card_2_c_ic"));
-        addCard(new CardView("card_2_c_ic"));
+        addCard(new CardView("assets/card_2_c_ic"));
+        addCard(new CardView("assets/card_2_c_ic"));
+        addCard(new CardView("assets/card_2_c_ic"));
+        addCard(new CardView("assets/card_2_c_ic"));
 
         this.add(cardsContainer);
         this.add(scoreContainer);
