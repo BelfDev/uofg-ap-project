@@ -15,11 +15,11 @@ class BJTableView extends JPanel {
         PlayerView p4 = new PlayerView();
         PlayerView p5 = new PlayerView();
 
-        p1.setLocation(16, 200);
-        p2.setLocation(265, 276);
-        p3.setLocation(548, 312);
-        p4.setLocation(830, 276);
-        p5.setLocation(1064, 200);
+        p1.setLocation(8, 240);
+        p2.setLocation(265, 306);
+        p3.setLocation(524, 324);
+        p4.setLocation(780, 306);
+        p5.setLocation(1038, 240);
 
 
         add(p1);
