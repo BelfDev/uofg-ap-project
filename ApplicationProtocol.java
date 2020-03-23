@@ -1,3 +1,3 @@
 interface ApplicationProtocol {
-    public Move processInput(Move input);
+    public ServerResponse processInput(ClientRequest request);
 }

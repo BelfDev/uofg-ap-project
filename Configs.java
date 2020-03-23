@@ -4,7 +4,7 @@ class Configs {
 
     // Sockets
     public static final String SERVER_HOST = "127.0.0.1";
-    public static int SERVER_PORT = 8888;
+    public static int SERVER_PORT = 8765;
 
     // Client appearance
     // - Window

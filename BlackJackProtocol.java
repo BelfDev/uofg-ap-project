@@ -1,20 +1,23 @@
 
 class BlackJackProtocol implements ApplicationProtocol {
 
-    public BlackJackProtocol() {
+    private GameState gameState;
 
+    public BlackJackProtocol(GameState gameState) {
+        this.gameState = gameState;
     }
 
     @Override
-    public Move processInput(Move input) {
-        String output;
-        if (input.getCommand().equals("oi")) {
-            output = "koeh";
+    public synchronized ServerResponse processInput(ClientRequest request) {
+        if (request.getCommand() == Command.JOIN) {
+            synchronized (this) {
+                int numberOfPlayers = gameState.getNumberOfPlayers();
+                gameState.setNumberOfPlayers(++numberOfPlayers);
+            }
         } else {
-            output = "não sei";
+            System.out.println("CAN'T DO MUCH");
         }
-        Move move = new Move(output);
-        return move;
+        return new ServerResponse(ResponseStatus.OK, gameState);
     }
 
 }

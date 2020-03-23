@@ -46,10 +46,10 @@ class GameServer implements Runnable, Observer {
 
     @Override
 	public void update(Observable o, Object arg) {
-        Move m = (Move) arg;
+        ServerResponse r = (ServerResponse) arg;
         for (BlackJackService service : services) {
             if (service != null) {
-                service.transmitMessage(m);
+                service.transmitMessage(r);
             }
         }
     }

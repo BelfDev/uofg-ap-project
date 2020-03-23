@@ -1,6 +1,6 @@
-import java.net.Socket;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.Scanner;
 
 public class Writer implements Runnable {
@@ -15,9 +15,16 @@ public class Writer implements Runnable {
             Scanner sc = new Scanner(System.in);
             ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
             String line;
-            System.out.println("What is your move?");
+
             while (!(line = sc.nextLine()).equals("END")) {
-                os.writeObject(new Move(line));
+                Command command;
+                try {
+                    command = Command.valueOf(line);
+                } catch (IllegalArgumentException e) {
+                    command = Command.QUIT;
+                }
+                ClientRequest request = new ClientRequest(command, 0);
+                os.writeObject(request);
             }
             sc.close();
             os.close();

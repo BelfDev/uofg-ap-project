@@ -1,11 +1,8 @@
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Observable;
-import java.util.Observer;
 
 /**
  * Customized thread dedicated to the game server. This class handles the
@@ -19,9 +16,8 @@ class BlackJackService extends Observable implements Runnable {
     private ObjectOutputStream output = null;
     private ObjectInputStream input = null;
 
-    private Move move;
-
-    GameServer server;
+    private ServerResponse response;
+    private GameState gameState;
 
     /**
      * Creates a GameServer thread that listens to client input and outputs new game
@@ -37,31 +33,29 @@ class BlackJackService extends Observable implements Runnable {
         // Sets the current client
         this.client = client;
         // Creates an ObjectOutputStream to send data from the server to the client
-        output = new ObjectOutputStream(client.getOutputStream());
+        this.output = new ObjectOutputStream(client.getOutputStream());
         // Creates an ObjectInputStream to retrieve data from the client
-        input = new ObjectInputStream(client.getInputStream());
+        this.input = new ObjectInputStream(client.getInputStream());
+        // Creates the game state
+        this.gameState = new GameState();
     }
 
     @Override
     public void run() {
         // Opens readers and writers on the client socket's input and output streams
         try {
-            Move inputMove, outputMove;
+            ClientRequest clientRequest;
 
             // Initiates the application communication protocol
-            BlackJackProtocol blackJackProtocol = new BlackJackProtocol();
+            BlackJackProtocol blackJackProtocol = new BlackJackProtocol(gameState);
 
-            while ((inputMove = (Move) input.readObject()) != null) {
-                outputMove = blackJackProtocol.processInput(inputMove);
-                setMove(outputMove);
-                
-                // System.out.println(inputMove);
-                // output.writeObject(outputMove);
-                // output.flush();
+            while ((clientRequest = (ClientRequest) input.readObject()) != null) {
+                synchronized (this) {
+                    ServerResponse response = blackJackProtocol.processInput(clientRequest);
+                    setResponse(response);
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
             try {
@@ -77,15 +71,17 @@ class BlackJackService extends Observable implements Runnable {
 
     }
 
-    public void setMove(Move move) {
-        this.move = move;
+    synchronized public void setResponse(ServerResponse response) {
+        this.response = response;
         setChanged();
-        notifyObservers(move);
+        notifyObservers(response);
     }
 
-    public void transmitMessage(Move m) {
+    synchronized public void transmitMessage(ServerResponse response) {
         try {
-            output.writeObject(m);
+            System.out.println(response);
+            output.writeObject(response);
+            output.reset();
         } catch (IOException e) {
             e.printStackTrace();
         }

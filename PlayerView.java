@@ -64,11 +64,8 @@ public class PlayerView extends JPanel {
         scoreLabel.setLocation(cardsContainer.getWidth() - SCORE_LABEL_SIZE, 0);
 
         addCard(new CardView("assets/card_2_c_ic"));
-        addCard(new CardView("assets/card_2_c_ic"));
-        addCard(new CardView("assets/card_2_c_ic"));
-        addCard(new CardView("assets/card_2_c_ic"));
-        addCard(new CardView("assets/card_2_c_ic"));
-        addCard(new CardView("assets/card_2_c_ic"));
+        addCard(new CardView("assets/card_10_d_ic"));
+        addCard(new CardView("assets/card_a_h_ic"));
 
         cardsContainer.add(scoreLabel);
 
