@@ -10,10 +10,17 @@ import java.util.Observer;
  * listening for multiple client connections. Once a client connects, it serves
  * the BlackJackService.
  */
-class GameServer implements Runnable, Observer {
+class GameServerThread extends Thread implements Observer {
 
+    // Object that holds the shared game state
+    private GameState sharedState;
     // Indicates that the server is open for clients through the SERVER_PORT
-    private boolean openToClients = true;
+    private boolean openToClients;
+
+    public GameServerThread() {
+        this.sharedState = new GameState();
+        this.openToClients = true;
+    }
 
     private ArrayList<BlackJackService> services = new ArrayList<>();
 
@@ -27,7 +34,7 @@ class GameServer implements Runnable, Observer {
                 // Establishes a new client socket connection
                 Socket clientSocket = serverSocket.accept();
                 // Creates a new black jack service
-                BlackJackService blackJackService = new BlackJackService(clientSocket);
+                BlackJackService blackJackService = new BlackJackService(clientSocket, sharedState);
                 blackJackService.addObserver(this);
                 services.add(blackJackService);
                 // Creates a new black jack service Thread

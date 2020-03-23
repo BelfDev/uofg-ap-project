@@ -28,8 +28,7 @@ class BlackJackService extends Observable implements Runnable {
      *                     the socket is closed, the socket is not connected, or the
      *                     socket input has been shutdown using
      */
-    public BlackJackService(Socket client) throws IOException {
-        // super("GameServerThread");
+    public BlackJackService(Socket client, GameState state) throws IOException {
         // Sets the current client
         this.client = client;
         // Creates an ObjectOutputStream to send data from the server to the client
@@ -37,7 +36,7 @@ class BlackJackService extends Observable implements Runnable {
         // Creates an ObjectInputStream to retrieve data from the client
         this.input = new ObjectInputStream(client.getInputStream());
         // Creates the game state
-        this.gameState = new GameState();
+        this.gameState = state;
     }
 
     @Override
@@ -81,6 +80,7 @@ class BlackJackService extends Observable implements Runnable {
         try {
             System.out.println(response);
             output.writeObject(response);
+            output.flush();
             output.reset();
         } catch (IOException e) {
             e.printStackTrace();

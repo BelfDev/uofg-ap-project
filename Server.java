@@ -6,9 +6,10 @@
  */
 class Server {
 
+
     public static void main(String[] args) {
         // Creates a new thread to run the GameServer
-        Thread serverThread = new Thread(new GameServer());
+        Thread serverThread = new GameServerThread();
         // Starts the server thread
         serverThread.start();
         // Guarantees that the serverThread will terminate
