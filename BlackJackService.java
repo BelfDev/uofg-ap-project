@@ -11,19 +11,19 @@ import java.util.Observable;
  */
 class BlackJackService extends Observable implements Runnable {
 
+    private final GameState gameState;
+
     private Socket client;
-
-    private ObjectOutputStream output = null;
-    private ObjectInputStream input = null;
-
+    private ObjectOutputStream output;
+    private ObjectInputStream input;
     private ServerResponse response;
-    private GameState gameState;
 
     /**
      * Creates a GameServer thread that listens to client input and outputs new game
      * state.
      * 
      * @param client the client socket connection
+     * @param state the game state shared between all players
      * @throws IOException if an I/O error occurs when creating the input stream,
      *                     the socket is closed, the socket is not connected, or the
      *                     socket input has been shutdown using
@@ -31,12 +31,12 @@ class BlackJackService extends Observable implements Runnable {
     public BlackJackService(Socket client, GameState state) throws IOException {
         // Sets the current client
         this.client = client;
+        // Creates the game state
+        this.gameState = state;
         // Creates an ObjectOutputStream to send data from the server to the client
         this.output = new ObjectOutputStream(client.getOutputStream());
         // Creates an ObjectInputStream to retrieve data from the client
         this.input = new ObjectInputStream(client.getInputStream());
-        // Creates the game state
-        this.gameState = state;
     }
 
     @Override
@@ -70,13 +70,13 @@ class BlackJackService extends Observable implements Runnable {
 
     }
 
-    synchronized public void setResponse(ServerResponse response) {
+    public void setResponse(ServerResponse response) {
         this.response = response;
         setChanged();
         notifyObservers(response);
     }
 
-    synchronized public void transmitMessage(ServerResponse response) {
+    public void transmitMessage(ServerResponse response) {
         try {
             System.out.println(response);
             output.writeObject(response);

@@ -13,7 +13,7 @@ import java.util.Observer;
 class GameServerThread extends Thread implements Observer {
 
     // Object that holds the shared game state
-    private GameState sharedState;
+    private final GameState sharedState;
     // Indicates that the server is open for clients through the SERVER_PORT
     private boolean openToClients;
 
