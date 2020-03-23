@@ -8,31 +8,7 @@ import java.net.Socket;
 class Client {
 
     public static void main(String[] args) {
-//        ClientApp.launch();
-        connectToServer();
-    }
-
-    private static void connectToServer() {
-        Socket clientSocket = null;
-        try {
-            clientSocket = new Socket(Configs.SERVER_HOST, Configs.SERVER_PORT);
-            Thread writeThread = new Thread(new Writer(clientSocket));
-            ReadWorker readWorker = new ReadWorker(clientSocket);
-
-            writeThread.start();
-            readWorker.execute();
-
-            writeThread.join();
-
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                clientSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        ClientApp.launch();
     }
 
 }

@@ -41,6 +41,10 @@ class TopBarView extends JPanel {
         return playersValueLabel;
     }
 
+    public void setPlayersValueLabelText(String value) {
+        this.playersValueLabel.setText(value);
+    }
+
     // Content setup
 
     private void addPanels() {

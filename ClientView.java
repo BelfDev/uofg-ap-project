@@ -3,14 +3,18 @@ import java.awt.*;
 
 class ClientView extends JFrame {
 
-    private JPanel topBar;
-    private JPanel mainContent;
-    private JPanel bottomBar;
+    private TopBarView topBar;
+    private BJTableView mainContent;
+    private BottomBarView bottomBar;
 
     public ClientView() {
         setupWindow();
         setupPanels();
         setVisible(true);
+    }
+
+    public void setNumberOfPlayers(String numberOfPlayers) {
+        topBar.setPlayersValueLabelText(numberOfPlayers);
     }
 
     private void setupWindow() {
@@ -32,6 +36,5 @@ class ClientView extends JFrame {
         this.add(mainContent, BorderLayout.CENTER);
         this.add(bottomBar, BorderLayout.SOUTH);
     }
-
 
 }
