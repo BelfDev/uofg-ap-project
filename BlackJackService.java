@@ -12,8 +12,8 @@ import java.util.Observable;
 class BlackJackService extends Observable implements Runnable {
 
     private final GameState gameState;
+    private final Socket clientSocket;
 
-    private Socket client;
     private ObjectOutputStream output;
     private ObjectInputStream input;
     private ServerResponse response;
@@ -21,22 +21,22 @@ class BlackJackService extends Observable implements Runnable {
     /**
      * Creates a GameServer thread that listens to client input and outputs new game
      * state.
-     * 
-     * @param client the client socket connection
-     * @param state the game state shared between all players
+     *
+     * @param clientSocket the client socket connection
+     * @param state  the game state shared between all players
      * @throws IOException if an I/O error occurs when creating the input stream,
      *                     the socket is closed, the socket is not connected, or the
      *                     socket input has been shutdown using
      */
-    public BlackJackService(Socket client, GameState state) throws IOException {
+    public BlackJackService(Socket clientSocket, GameState state) throws IOException {
         // Sets the current client
-        this.client = client;
+        this.clientSocket = clientSocket;
         // Creates the game state
         this.gameState = state;
         // Creates an ObjectOutputStream to send data from the server to the client
-        this.output = new ObjectOutputStream(client.getOutputStream());
+        this.output = new ObjectOutputStream(clientSocket.getOutputStream());
         // Creates an ObjectInputStream to retrieve data from the client
-        this.input = new ObjectInputStream(client.getInputStream());
+        this.input = new ObjectInputStream(clientSocket.getInputStream());
     }
 
     @Override
@@ -49,20 +49,17 @@ class BlackJackService extends Observable implements Runnable {
             BlackJackProtocol blackJackProtocol = new BlackJackProtocol(gameState);
 
             while ((clientRequest = (ClientRequest) input.readObject()) != null) {
-                synchronized (this) {
-                    ServerResponse response = blackJackProtocol.processInput(clientRequest);
-                    setResponse(response);
-                }
+                ServerResponse response = blackJackProtocol.processInput(clientRequest);
+                setResponse(response);
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
             try {
                 // Closes streams and sockets
-                client.close();
-                output.close();
                 input.close();
-
+                output.close();
+                clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

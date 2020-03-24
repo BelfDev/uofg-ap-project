@@ -3,6 +3,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
+//TODO: Used for debugging purposes. Delete this afterwards.
 public class Writer implements Runnable {
     private Socket socket;
 
@@ -23,7 +24,7 @@ public class Writer implements Runnable {
                 } catch (IllegalArgumentException e) {
                     command = Command.QUIT;
                 }
-                ClientRequest request = new ClientRequest(command, 0);
+                ClientRequest request = new ClientRequest.Builder(command, 0).build();
                 os.writeObject(request);
             }
             sc.close();

@@ -52,7 +52,7 @@ class GameServerThread extends Thread implements Observer {
     }
 
     @Override
-	public void update(Observable o, Object arg) {
+    public void update(Observable o, Object arg) {
         ServerResponse r = (ServerResponse) arg;
         for (BlackJackService service : services) {
             if (service != null) {
