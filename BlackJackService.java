@@ -15,7 +15,6 @@ class BlackJackService extends Observable implements Runnable {
 
     private ObjectOutputStream output;
     private ObjectInputStream input;
-    private ServerResponse response;
 
     /**
      * Constructs a BlackJackService that listens for client requests, processes
@@ -65,7 +64,6 @@ class BlackJackService extends Observable implements Runnable {
     }
 
     private void notifyResponse(ServerResponse response) {
-        this.response = response;
         setChanged();
         notifyObservers(response);
     }
