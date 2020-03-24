@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ClientRequest implements Serializable {
@@ -7,14 +8,7 @@ public class ClientRequest implements Serializable {
     private int playerId;
     private Map<String, String> payload;
 
-    public ClientRequest(Command command, int playerId, Map<String, String> payload) {
-        this.command = command;
-        this.playerId = playerId;
-        this.payload = payload;
-    }
-
-    public ClientRequest(Command command, int playerId) {
-        this(command, playerId, null);
+    private ClientRequest() {
     }
 
     public Command getCommand() {
@@ -29,4 +23,30 @@ public class ClientRequest implements Serializable {
         return payload;
     }
 
+    public static class Builder {
+
+        private Command command;
+        private int playerId;
+        private Map<String, String> payload;
+
+        public Builder(Command command, int playerId) {
+            this.command = command;
+            this.playerId = playerId;
+            this.payload = new HashMap<>();
+        }
+
+        public Builder withData(String key, String value) {
+            payload.put(key, value);
+            return this;
+        }
+
+        public ClientRequest build() {
+            ClientRequest request = new ClientRequest();
+            request.command = this.command;
+            request.playerId = this.playerId;
+            request.payload = this.payload;
+            return request;
+        }
+
+    }
 }
