@@ -5,9 +5,8 @@ import java.net.Socket;
 import java.util.Observable;
 
 /**
- * Customized thread dedicated to the game server. This class handles the
- * gathering of client I/O streams and outputs of the relevant game state based
- * on the BlackJack protocol.
+ * This class handles the reception of client I/O streams and
+ * outputs of the relevant game state based on the BlackJack protocol.
  */
 class BlackJackService extends Observable implements Runnable {
 
@@ -19,19 +18,17 @@ class BlackJackService extends Observable implements Runnable {
     private ServerResponse response;
 
     /**
-     * Creates a GameServer thread that listens to client input and outputs new game
-     * state.
+     * Constructs a BlackJackService that listens for client requests, processes
+     * its content according to the BlackJackProtocol, and outputs a server response.
      *
      * @param clientSocket the client socket connection
-     * @param state  the game state shared between all players
-     * @throws IOException if an I/O error occurs when creating the input stream,
-     *                     the socket is closed, the socket is not connected, or the
-     *                     socket input has been shutdown using
+     * @param state        the current shared game state
+     * @throws IOException
      */
     public BlackJackService(Socket clientSocket, GameState state) throws IOException {
-        // Sets the current client
+        // Sets the current client connection
         this.clientSocket = clientSocket;
-        // Creates the game state
+        // Sets the relevant initial game state
         this.gameState = state;
         // Creates an ObjectOutputStream to send data from the server to the client
         this.output = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -41,22 +38,22 @@ class BlackJackService extends Observable implements Runnable {
 
     @Override
     public void run() {
-        // Opens readers and writers on the client socket's input and output streams
+        ClientRequest clientRequest;
         try {
-            ClientRequest clientRequest;
-
             // Initiates the application communication protocol
             BlackJackProtocol blackJackProtocol = new BlackJackProtocol(gameState);
-
+            // Continuously watches for client input
             while ((clientRequest = (ClientRequest) input.readObject()) != null) {
+                // Generates a server response based on the BlackJackProtocol interpretation
                 ServerResponse response = blackJackProtocol.processInput(clientRequest);
-                setResponse(response);
+                // Notifies the generated response to observers
+                notifyResponse(response);
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
             try {
-                // Closes streams and sockets
+                // Closes streams and socket connections
                 input.close();
                 output.close();
                 clientSocket.close();
@@ -67,17 +64,23 @@ class BlackJackService extends Observable implements Runnable {
 
     }
 
-    public void setResponse(ServerResponse response) {
+    private void notifyResponse(ServerResponse response) {
         this.response = response;
         setChanged();
         notifyObservers(response);
     }
 
+    /**
+     * Sends out the server response as an ObjectOutputStream
+     *
+     * @param response the response to be transmitted to the client
+     */
     public void transmitMessage(ServerResponse response) {
         try {
             System.out.println(response);
             output.writeObject(response);
             output.flush();
+            // Enforces ObjectOutputStream cache reset
             output.reset();
         } catch (IOException e) {
             e.printStackTrace();

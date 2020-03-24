@@ -8,12 +8,13 @@ class Server {
 
 
     public static void main(String[] args) {
-        // Creates a new thread to run the GameServer
+        // Creates a new GameServerThread
         Thread serverThread = new GameServerThread();
         // Starts the server thread
         serverThread.start();
-        // Guarantees that the serverThread will terminate
+
         try {
+            // Guarantees that the server will terminate
             serverThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();

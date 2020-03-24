@@ -1,14 +1,11 @@
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 class ClientController implements StateListener{
 
     private ClientView view;
-    private RequestSender sender;
+    private RequestSender requestSender;
 
-    public ClientController(ClientView view, RequestSender sender) {
+    public ClientController(ClientView view, RequestSender requestSender) {
         this.view = view;
-        this.sender= sender;
+        this.requestSender = requestSender;
 
         view.setHitButtonActionListener(e -> sendRequest());
     }
@@ -17,7 +14,7 @@ class ClientController implements StateListener{
         ClientRequest request = new ClientRequest.Builder(Command.JOIN, 1)
                 .withData("key", "value")
                 .build();
-        sender.sendRequest(request);
+        requestSender.sendRequest(request);
     }
 
     @Override

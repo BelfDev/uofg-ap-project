@@ -6,26 +6,25 @@ import java.util.Observable;
 import java.util.Observer;
 
 /**
- * This class starts the game server by creating a new ServerSocket and
- * listening for multiple client connections. Once a client connects, it serves
- * the BlackJackService.
+ * This class starts a game server by creating a new ServerSocket and
+ * listening for multiple client connections. Once a client connects
+ * this class serves a BlackJackService.
  */
 class GameServerThread extends Thread implements Observer {
 
     // Object that holds the shared game state
     private final GameState sharedState;
-    // Indicates that the server is open for clients through the SERVER_PORT
-    private boolean openToClients;
+    // A collection of live black jack services
+    private ArrayList<BlackJackService> services = new ArrayList<>();
 
     public GameServerThread() {
         this.sharedState = new GameState();
-        this.openToClients = true;
     }
-
-    private ArrayList<BlackJackService> services = new ArrayList<>();
 
     @Override
     public void run() {
+        // Indicates that the server is open for clients through the SERVER_PORT
+        boolean openToClients = true;
         // Creates a server socket with SERVER_PORT. The try-with-resources statement
         // automatically closes the socket when necessary in runtime
         try (ServerSocket serverSocket = new ServerSocket(Configs.SERVER_PORT)) {
@@ -35,17 +34,17 @@ class GameServerThread extends Thread implements Observer {
                 Socket clientSocket = serverSocket.accept();
                 // Creates a new black jack service
                 BlackJackService blackJackService = new BlackJackService(clientSocket, sharedState);
+                // Registers this service as an observer
                 blackJackService.addObserver(this);
                 services.add(blackJackService);
-                // Creates a new black jack service Thread
+                // Creates a new thread for the black jack service
                 Thread blackJackServiceThread = new Thread(blackJackService);
-
+                // Indicates in the console that a new client has connected to the server
                 System.out.println("New client connected at " + blackJackServiceThread.getName());
-                // Starts the black jack service thread thread execution
+                // Starts the black jack service thread execution
                 blackJackServiceThread.start();
             }
         } catch (IOException e) {
-            // In case the SERVER_PORT cannot be read, print the stack trace
             e.printStackTrace();
         }
 
@@ -53,10 +52,11 @@ class GameServerThread extends Thread implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        ServerResponse r = (ServerResponse) arg;
+        ServerResponse response = (ServerResponse) arg;
+        // Triggers the transmission of the response in all live services
         for (BlackJackService service : services) {
             if (service != null) {
-                service.transmitMessage(r);
+                service.transmitMessage(response);
             }
         }
     }
