@@ -18,8 +18,10 @@ class ClientView extends JFrame {
         topBar.setPlayersValueLabelText(numberOfPlayers);
     }
 
-    public void setHitButtonActionListener(ActionListener listener) {
-        bottomBar.getDealButton().addActionListener(listener);
+    public void setActionListener(ActionListener listener) {
+        JButton quitButton = bottomBar.getQuitButton();
+        quitButton.setActionCommand(ClientActionType.QUIT_GAME.toString());
+        quitButton.addActionListener(listener);
     }
 
     private void setupWindow() {

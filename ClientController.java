@@ -1,6 +1,10 @@
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.util.List;
 
-class ClientController implements StateListener {
+class ClientController implements StateListener, ActionListener {
 
     private ClientView view;
     private RequestSender requestSender;
@@ -13,18 +17,13 @@ class ClientController implements StateListener {
         this.activePlayer = null;
         this.playerList = null;
 
-        view.setHitButtonActionListener(e -> sendRequest());
-    }
-
-    private void sendRequest() {
-        ClientRequest request = new ClientRequest.Builder(Command.JOIN, 1)
-                .withData("key", "value")
-                .build();
-        requestSender.sendRequest(request);
+        view.setActionListener(this);
     }
 
     @Override
     public void onReceiveState(GameState state) {
+        System.out.println("RECEIVED NEW STATE");
+        System.out.println(state);
         updateNumberOfPlayersIfNeeded(state.getNumberOfPlayers());
         playerList = state.getPlayers();
         initActivePlayerIfNeeded();
@@ -42,6 +41,32 @@ class ClientController implements StateListener {
         if (activePlayer == null) {
             activePlayer = playerList.get(playerList.size() - 1);
             System.out.println("Current player ID: " + activePlayer.getId());
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        ClientActionType action = ClientActionType.valueOf(e.getActionCommand());
+        System.out.println(action.toString());
+        switch (action) {
+            case QUIT_GAME:
+                quitGame();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void quitGame() {
+        // Confirms whether the user want to quit the game
+        int input = JOptionPane.showConfirmDialog(view, "Do you want to quit the game?");
+        if (input == 0) {
+            // Sends out a quit request to the server
+            requestSender.sendRequest(
+                    new ClientRequest.Builder(Command.QUIT, activePlayer.getId())
+                            .build());
+            // Closes the application
+            view.dispatchEvent(new WindowEvent(view, WindowEvent.WINDOW_CLOSING));
         }
     }
 

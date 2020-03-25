@@ -1,15 +1,15 @@
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Player implements Serializable {
 
-    private final AtomicInteger id;
+    private final AtomicReference<String> id;
 
-    public Player(int id) {
-        this.id = new AtomicInteger(id);
+    public Player(String id) {
+        this.id = new AtomicReference<>(id);
     }
 
-    public int getId() {
+    public synchronized String getId() {
         return id.get();
     }
 

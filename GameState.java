@@ -2,49 +2,43 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.UUID;
 
 public class GameState implements Serializable {
 
-    private final AtomicInteger numberOfPlayers;
-    private List<Player> players = Collections.synchronizedList(new ArrayList<>());
-
+    private List<Player> players;
 
     public GameState() {
-        this.numberOfPlayers = new AtomicInteger(0);
+        this.players = Collections.synchronizedList(new ArrayList<>());
     }
 
     public int getNumberOfPlayers() {
-        return numberOfPlayers.get();
+        return players.size();
     }
 
     public List<Player> getPlayers() {
         return players;
     }
 
-    public void incrementNumberOfPlayers() {
-        numberOfPlayers.incrementAndGet();
-    }
-
-    public void addNewPlayer() {
-        int playerId = numberOfPlayers.incrementAndGet();
+    public synchronized void addNewPlayer() {
+        String playerId = UUID.randomUUID().toString();
         Player player = new Player(playerId);
         players.add(player);
     }
 
-    public void removePlayer(int id) {
-        players.remove(id - 1);
-        numberOfPlayers.decrementAndGet();
-    }
-
-    public void decrementNumberOfPlayers() {
-        numberOfPlayers.decrementAndGet();
+    public synchronized void removePlayer(String id) {
+        Player player = players.stream()
+                .filter(p -> p.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+        players.remove(player);
     }
 
     @Override
     public String toString() {
         return "GameState{" +
-                "numberOfPlayers=" + numberOfPlayers +
+                "numberOfPlayers = " + players.size() +
+                " players=" + players +
                 '}';
     }
 

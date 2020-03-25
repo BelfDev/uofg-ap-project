@@ -50,14 +50,31 @@ class GameServerThread extends Thread implements Observer {
 
     }
 
+//    @Override
+//    public void update(Observable o, Object arg) {
+//        ServerResponse response = (ServerResponse) arg;
+//        // Triggers the transmission of the response in all live services
+//        for (BlackJackService service : services) {
+//            if (service != null && service.isAlive()) {
+//                service.transmitMessage(response);
+//            } else if (service != null && !service.isAlive()) {
+//                services.remove(service);
+//            }
+//        }
+//    }
+
     @Override
     public void update(Observable o, Object arg) {
+        BlackJackService origin = (BlackJackService) o;
         ServerResponse response = (ServerResponse) arg;
         // Triggers the transmission of the response in all live services
         for (BlackJackService service : services) {
-            if (service != null) {
+            if (service != null && service.isAlive()) {
                 service.transmitMessage(response);
             }
+        }
+        if (!origin.isAlive()) {
+            services.remove(origin);
         }
     }
 

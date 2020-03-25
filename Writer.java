@@ -24,7 +24,7 @@ public class Writer implements Runnable {
                 } catch (IllegalArgumentException e) {
                     command = Command.QUIT;
                 }
-                ClientRequest request = new ClientRequest.Builder(command, 0).build();
+                ClientRequest request = new ClientRequest.Builder(command, null).build();
                 os.writeObject(request);
             }
             sc.close();

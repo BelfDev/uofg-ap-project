@@ -5,7 +5,7 @@ import java.util.Map;
 public class ClientRequest implements Serializable {
 
     private Command command;
-    private int playerId;
+    private String playerId;
     private Map<String, String> payload;
 
     private ClientRequest() {
@@ -15,7 +15,7 @@ public class ClientRequest implements Serializable {
         return command;
     }
 
-    public int getPlayerId() {
+    public String getPlayerId() {
         return playerId;
     }
 
@@ -26,10 +26,10 @@ public class ClientRequest implements Serializable {
     public static class Builder {
 
         private Command command;
-        private int playerId;
+        private String playerId;
         private Map<String, String> payload;
 
-        public Builder(Command command, int playerId) {
+        public Builder(Command command, String playerId) {
             this.command = command;
             this.playerId = playerId;
             this.payload = new HashMap<>();

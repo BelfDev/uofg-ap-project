@@ -1,3 +1,4 @@
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,6 +14,7 @@ class BlackJackService extends Observable implements Runnable {
     private final GameState gameState;
     private final Socket clientSocket;
 
+    private boolean isAlive;
     private ObjectOutputStream output;
     private ObjectInputStream input;
 
@@ -29,10 +31,16 @@ class BlackJackService extends Observable implements Runnable {
         this.clientSocket = clientSocket;
         // Sets the relevant initial game state
         this.gameState = state;
+        // Indicates if the current service is still being served
+        this.isAlive = true;
         // Creates an ObjectOutputStream to send data from the server to the client
         this.output = new ObjectOutputStream(clientSocket.getOutputStream());
         // Creates an ObjectInputStream to retrieve data from the client
         this.input = new ObjectInputStream(clientSocket.getInputStream());
+    }
+
+    public boolean isAlive() {
+        return isAlive;
     }
 
     @Override
@@ -45,11 +53,17 @@ class BlackJackService extends Observable implements Runnable {
             while ((clientRequest = (ClientRequest) input.readObject()) != null) {
                 // Generates a server response based on the BlackJackProtocol interpretation
                 ServerResponse response = blackJackProtocol.processInput(clientRequest);
+                // Indicates the service should be torn down
+                if (clientRequest.getCommand() == Command.QUIT) {
+                    this.isAlive = false;
+                }
                 // Notifies the generated response to observers
                 notifyResponse(response);
             }
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (EOFException ex1) {
+            System.out.println("Service terminated");
+        } catch (IOException | ClassNotFoundException ex2) {
+            ex2.printStackTrace();
         } finally {
             try {
                 // Closes streams and socket connections

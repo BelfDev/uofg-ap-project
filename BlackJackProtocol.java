@@ -14,7 +14,9 @@ class BlackJackProtocol implements ApplicationProtocol {
                 gameState.addNewPlayer();
                 break;
             case QUIT:
-                System.out.println("CAN'T DO MUCH");
+                gameState.removePlayer(request.getPlayerId());
+                String feedback = String.format("Player %s has left the game", request.getPlayerId());
+                System.out.println(feedback);
                 break;
         }
 
