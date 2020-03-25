@@ -9,11 +9,15 @@ class BlackJackProtocol implements ApplicationProtocol {
 
     @Override
     public synchronized ServerResponse processInput(ClientRequest request) {
-        if (request.getCommand() == Command.JOIN) {
-            gameState.incrementNumberOfPlayers();
-        } else {
-            System.out.println("CAN'T DO MUCH");
+        switch (request.getCommand()) {
+            case JOIN:
+                gameState.addNewPlayer();
+                break;
+            case QUIT:
+                System.out.println("CAN'T DO MUCH");
+                break;
         }
+
         return new ServerResponse(ResponseStatus.OK, gameState);
     }
 

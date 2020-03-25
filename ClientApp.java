@@ -67,8 +67,10 @@ class ClientApp implements RequestSender {
             // Creates worker to handle incoming server responses
             ResponseWorker responseWorker = new ResponseWorker(clientSocket, broadcaster);
             responseWorker.execute();
+            // Creates an initial JOIN request to enter the game
+            ClientRequest joinRequest = new ClientRequest.Builder(Command.JOIN, -1).build();
             // Sends out initial request notifying the server about a new player
-            sendRequest(new ClientRequest.Builder(Command.JOIN, 1).build());
+            sendRequest(joinRequest);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -14,7 +14,7 @@ class ClientView extends JFrame {
         setVisible(true);
     }
 
-    public void setNumberOfPlayers(String numberOfPlayers) {
+    public void updateNumberOfPlayersLabel(String numberOfPlayers) {
         topBar.setPlayersValueLabelText(numberOfPlayers);
     }
 
