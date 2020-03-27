@@ -45,6 +45,10 @@ class TopBarView extends JPanel {
         this.playersValueLabel.setText(value);
     }
 
+    public void setBalanceValue(String value) {
+        this.balanceValueLabel.setText(value);
+    }
+
     // Content setup
 
     private void addPanels() {
@@ -57,7 +61,7 @@ class TopBarView extends JPanel {
         JLabel balanceLabel = createLabel("BALANCE");
         Font customizedFont = Utils.getBoldFont(balanceLabel.getFont(), Configs.TOP_BAR_STATIC_LABEL_FONT_SIZE);
         balanceLabel.setFont(customizedFont);
-        balanceValueLabel = createLabel("100");
+        balanceValueLabel = createLabel("0");
 
         balanceContainer.add(Box.createVerticalGlue());
         balanceContainer.add(balanceLabel);

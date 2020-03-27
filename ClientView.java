@@ -24,6 +24,10 @@ class ClientView extends JFrame {
         return playerViewMap;
     }
 
+    public void setBalance(String balance) {
+        topBar.setBalanceValue(balance);
+    }
+
     public void updateNumberOfPlayersLabel(String numberOfPlayers) {
         topBar.setPlayersValueLabelText(numberOfPlayers);
     }
