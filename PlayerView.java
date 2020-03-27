@@ -9,13 +9,15 @@ public class PlayerView extends JPanel {
     private static final int BET_CONTAINER_TOP_MARGIN = 32;
     private static final int BET_CONTAINER_HEIGHT = 60;
 
+    private String id;
     private int cardsCounter;
     private int slot;
     private JPanel cardsContainer;
     private JLabel scoreLabel;
     private JLabel nameLabel;
 
-    public PlayerView(int slot) {
+    public PlayerView(String playerId, int slot) {
+        this.id = playerId;
         this.slot = slot;
         this.setLayout(null);
         int width = Configs.CARD_SIZE.width + CARD_INSET * 4 + SCORE_LABEL_SIZE + SCORE_LABEL_LEFT_MARGIN;
@@ -30,6 +32,10 @@ public class PlayerView extends JPanel {
         add(betContainer);
 
         setOpaque(false);
+    }
+
+    public String getId() {
+        return id;
     }
 
     public int getSlot() {

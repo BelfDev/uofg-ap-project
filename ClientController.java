@@ -2,27 +2,23 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 class ClientController implements StateListener, ActionListener {
 
     private ClientView view;
     private RequestSender requestSender;
-    private Integer activePlayerSlot;
     private Player activePlayer;
     private List<Player> playerList;
-    private Stack<Integer> availableSlots;
 
     public ClientController(ClientView view, RequestSender requestSender) {
         this.view = view;
         this.requestSender = requestSender;
         this.activePlayer = null;
         this.playerList = null;
-        this.activePlayerSlot = null;
-        this.availableSlots = createSlots();
-
         view.setActionListener(this);
     }
 
@@ -30,27 +26,32 @@ class ClientController implements StateListener, ActionListener {
     public void onReceiveState(GameState state) {
         System.out.println("RECEIVED NEW STATE");
         System.out.println(state);
-
-        updateNumberOfPlayersIfNeeded(state.getNumberOfPlayers());
-//        updatePlayerViews(state.getPlayers());
+        // Stores previous player state
+        List<Player> previousPlayerState = playerList;
+        // Updates the player state
         playerList = state.getPlayers();
+        // Initialized this client's player view
         initActivePlayerIfNeeded();
-
+        // Updates the number of players
+        updateNumberOfPlayersIfNeeded(previousPlayerState, state.getNumberOfPlayers());
+        // Remove players who quit the game
+        removeQuitPlayers(previousPlayerState);
+        // Updates the players views
+        updatePlayerViews();
     }
 
-    private void updateNumberOfPlayersIfNeeded(int numberOfPlayers) {
-        if (playerList == null || playerList.size() != numberOfPlayers) {
-            String numberOfPlayersText = String.valueOf(numberOfPlayers);
+    private void updateNumberOfPlayersIfNeeded(List<Player> previousPlayerList, int currentNumberOfPlayers) {
+        if (previousPlayerList == null || previousPlayerList.size() != currentNumberOfPlayers) {
+            String numberOfPlayersText = String.valueOf(currentNumberOfPlayers);
             view.updateNumberOfPlayersLabel(numberOfPlayersText);
-            System.out.println("Number of players changed to " + numberOfPlayers);
+            System.out.println("Number of players changed to " + currentNumberOfPlayers);
         }
     }
 
     private void initActivePlayerIfNeeded() {
         if (activePlayer == null) {
             activePlayer = playerList.get(playerList.size() - 1);
-            activePlayerSlot = availableSlots.pop();
-            view.addNewPlayer("You", activePlayerSlot);
+            view.addNewPlayer("You", activePlayer.getId(), activePlayer.getSlot());
             System.out.println("Current player ID: " + activePlayer.getId());
         }
     }
@@ -81,20 +82,34 @@ class ClientController implements StateListener, ActionListener {
         }
     }
 
-    private Stack<Integer> createSlots() {
-        // Creates a stack with available slot numbers that will be consulted when positioning players
-        Stack<Integer> availableSlots = new Stack<>();
-        for (int i = Configs.MAX_NUMBER_OF_PLAYERS; i >= 1; i--) {
-            availableSlots.add(i);
+    private void updatePlayerViews() {
+        for (Player player : playerList) {
+            boolean hasPlayerView = view.getPlayerViewMap().containsKey(player.getId());
+            if (hasPlayerView) {
+                // TODO: Update some player view
+            } else if (!player.getId().equals(activePlayer.getId())) {
+                // Add a new player view
+                view.addNewPlayer("Someone", player.getId(), player.getSlot());
+            }
         }
-        return availableSlots;
+
     }
 
-    private void updatePlayerViews(List<Player> newPlayerList) {
-        List<Player> playerDiff = playerList.stream()
-                .filter(newPlayerList::contains)
-                .collect(Collectors.toList());
-        System.out.println(playerDiff);
+    private void removeQuitPlayers(List<Player> previousPlayers) {
+        // Remove players that quit
+        if (previousPlayers != null && previousPlayers.size() != playerList.size()) {
+            List<Player> oldPlayers = getPlayerDiff(previousPlayers);
+            for (Player player : oldPlayers) {
+                view.removePlayer(player.getId());
+            }
+        }
+    }
+
+    private List<Player> getPlayerDiff(List<Player> previousPlayers) {
+        Predicate<Player> notSameId = p1 -> playerList.stream().noneMatch(p2 -> p2.getId().equals(p1.getId()));
+        return previousPlayers.stream()
+                .filter(notSameId)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
 }

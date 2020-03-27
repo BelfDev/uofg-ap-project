@@ -1,7 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 class ClientView extends JFrame {
 
@@ -9,18 +10,34 @@ class ClientView extends JFrame {
     private BJTableView mainContent;
     private BottomBarView bottomBar;
 
+    private Map<String, PlayerView> playerViewMap;
+
     public ClientView() {
         setupWindow();
         setupPanels();
         setVisible(true);
+
+        this.playerViewMap = new HashMap<>();
+    }
+
+    public Map<String, PlayerView> getPlayerViewMap() {
+        return playerViewMap;
     }
 
     public void updateNumberOfPlayersLabel(String numberOfPlayers) {
         topBar.setPlayersValueLabelText(numberOfPlayers);
     }
 
-    public void addNewPlayer(String name, int slot) {
-        mainContent.addPlayer(name, slot);
+    public void addNewPlayer(String name, String id, int slot) {
+        PlayerView playerView = mainContent.addPlayer(name, id, slot);
+        if (playerView != null) {
+            playerViewMap.put(id, playerView);
+        }
+    }
+
+    public void removePlayer(String id) {
+        mainContent.removePlayer(id);
+        playerViewMap.remove(id);
     }
 
     public void setActionListener(ActionListener listener) {

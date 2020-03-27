@@ -17,9 +17,9 @@ class BJTableView extends JPanel {
         addDealer();
     }
 
-    public void addPlayer(String name, int slot) {
+    public PlayerView addPlayer(String name, String id, int slot) {
         if (slot <= Configs.MAX_NUMBER_OF_PLAYERS) {
-            PlayerView playerView = new PlayerView(slot);
+            PlayerView playerView = new PlayerView(id, slot);
             if (name != null) {
                 playerView.setName(name);
             }
@@ -27,20 +27,22 @@ class BJTableView extends JPanel {
             Point playerLocation = Configs.PLAYER_SLOT_LOCATIONS.get(slot);
             playerView.setLocation(playerLocation);
             add(playerView);
-            revalidate();
-            repaint();
+            refreshInterface();
+            return playerView;
         }
+        return null;
     }
 
-    public void removePlayer(int slot) {
+    public void removePlayer(String id) {
         PlayerView playerView = playerViews.stream()
-                .filter(p -> p.getSlot() == slot)
+                .filter(p -> p.getId().equals(id))
                 .findFirst()
                 .orElse(null);
         if (playerView != null) {
             remove(playerView);
             playerViews.remove(playerView);
         }
+        refreshInterface();
     }
 
     private void addDealer() {
@@ -56,5 +58,9 @@ class BJTableView extends JPanel {
         g.drawImage(backgroundImage, -2, -2, getWidth() + 4, getHeight() + 4, this);
     }
 
+    private void refreshInterface() {
+        revalidate();
+        repaint();
+    }
 
 }

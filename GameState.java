@@ -1,21 +1,21 @@
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class GameState implements Serializable {
 
     private AtomicReference<RoundPhase> roundPhase;
     // Indicates the game bottleneck (i.e. which player everyone is waiting for)
-    private AtomicReference<String>  bottleneck;
+    private AtomicReference<String> bottleneck;
+
     private List<Player> players;
+    private Stack<Integer> availableSlots;
 
     public GameState() {
         this.players = Collections.synchronizedList(new ArrayList<>());
         this.roundPhase = new AtomicReference<>(RoundPhase.INITIAL_BET);
         this.bottleneck = null;
+        this.availableSlots = createSlots();
     }
 
     public int getNumberOfPlayers() {
@@ -28,7 +28,8 @@ public class GameState implements Serializable {
 
     public synchronized void addNewPlayer() {
         String playerId = UUID.randomUUID().toString();
-        Player player = new Player(playerId);
+        Integer slot = availableSlots.pop();
+        Player player = new Player(playerId, slot);
         players.add(player);
     }
 
@@ -37,13 +38,26 @@ public class GameState implements Serializable {
                 .filter(p -> p.getId().equals(id))
                 .findFirst()
                 .orElse(null);
-        players.remove(player);
+        if (player != null) {
+            int newAvailableSlot = player.getSlot();
+            players.remove(player);
+            availableSlots.add(newAvailableSlot);
+        }
     }
 
     public synchronized void advanceRound() {
         int currentOrder = roundPhase.get().getOrder();
         RoundPhase nextRoundPhase = RoundPhase.getRoundOfOrder(++currentOrder);
         roundPhase.set(nextRoundPhase);
+    }
+
+    private Stack<Integer> createSlots() {
+        // Creates a stack with available slot numbers that will be consulted when positioning players
+        Stack<Integer> availableSlots = new Stack<>();
+        for (int i = Configs.MAX_NUMBER_OF_PLAYERS; i >= 1; i--) {
+            availableSlots.add(i);
+        }
+        return availableSlots;
     }
 
     @Override
