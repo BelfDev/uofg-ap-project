@@ -51,7 +51,7 @@ class ClientController implements StateListener, ActionListener {
     private void initActivePlayerIfNeeded() {
         if (activePlayer == null) {
             activePlayer = playerList.get(playerList.size() - 1);
-            view.addNewPlayer("You", activePlayer.getId(), activePlayer.getSlot());
+            view.addNewPlayer("You", activePlayer.getSlot());
             System.out.println("Current player ID: " + activePlayer.getId());
         }
     }
@@ -84,12 +84,12 @@ class ClientController implements StateListener, ActionListener {
 
     private void updatePlayerViews() {
         for (Player player : playerList) {
-            boolean hasPlayerView = view.getPlayerViewMap().containsKey(player.getId());
+            boolean hasPlayerView = view.getPlayerViewMap().containsKey(player.getSlot());
             if (hasPlayerView) {
                 // TODO: Update some player view
             } else if (!player.getId().equals(activePlayer.getId())) {
                 // Add a new player view
-                view.addNewPlayer("Someone", player.getId(), player.getSlot());
+                view.addNewPlayer("Someone", player.getSlot());
             }
         }
 
@@ -100,7 +100,7 @@ class ClientController implements StateListener, ActionListener {
         if (previousPlayers != null && previousPlayers.size() != playerList.size()) {
             List<Player> oldPlayers = getPlayerDiff(previousPlayers);
             for (Player player : oldPlayers) {
-                view.removePlayer(player.getId());
+                view.removePlayer(player.getSlot());
             }
         }
     }

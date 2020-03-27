@@ -17,9 +17,9 @@ class BJTableView extends JPanel {
         addDealer();
     }
 
-    public PlayerView addPlayer(String name, String id, int slot) {
+    public PlayerView addPlayer(String name, int slot) {
         if (slot <= Configs.MAX_NUMBER_OF_PLAYERS) {
-            PlayerView playerView = new PlayerView(id, slot);
+            PlayerView playerView = new PlayerView(slot);
             if (name != null) {
                 playerView.setName(name);
             }
@@ -33,9 +33,9 @@ class BJTableView extends JPanel {
         return null;
     }
 
-    public void removePlayer(String id) {
+    public void removePlayer(int slot) {
         PlayerView playerView = playerViews.stream()
-                .filter(p -> p.getId().equals(id))
+                .filter(p -> p.getSlot() == (slot))
                 .findFirst()
                 .orElse(null);
         if (playerView != null) {

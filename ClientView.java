@@ -10,7 +10,7 @@ class ClientView extends JFrame {
     private BJTableView mainContent;
     private BottomBarView bottomBar;
 
-    private Map<String, PlayerView> playerViewMap;
+    private Map<Integer, PlayerView> playerViewMap;
 
     public ClientView() {
         setupWindow();
@@ -20,7 +20,7 @@ class ClientView extends JFrame {
         this.playerViewMap = new HashMap<>();
     }
 
-    public Map<String, PlayerView> getPlayerViewMap() {
+    public Map<Integer, PlayerView> getPlayerViewMap() {
         return playerViewMap;
     }
 
@@ -28,16 +28,16 @@ class ClientView extends JFrame {
         topBar.setPlayersValueLabelText(numberOfPlayers);
     }
 
-    public void addNewPlayer(String name, String id, int slot) {
-        PlayerView playerView = mainContent.addPlayer(name, id, slot);
+    public void addNewPlayer(String name, int slot) {
+        PlayerView playerView = mainContent.addPlayer(name, slot);
         if (playerView != null) {
-            playerViewMap.put(id, playerView);
+            playerViewMap.put(slot, playerView);
         }
     }
 
-    public void removePlayer(String id) {
-        mainContent.removePlayer(id);
-        playerViewMap.remove(id);
+    public void removePlayer(int slot) {
+        mainContent.removePlayer(slot);
+        playerViewMap.remove(slot);
     }
 
     public void setActionListener(ActionListener listener) {
