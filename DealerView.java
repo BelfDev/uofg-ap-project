@@ -84,6 +84,7 @@ public class DealerView extends JPanel {
         scoreView.setForeground(Color.white);
         scoreView.setBackground(Color.black);
         scoreView.setText("21");
+        scoreView.setVisible(false);
 
         container.add(scoreView);
 

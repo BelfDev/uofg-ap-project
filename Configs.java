@@ -1,6 +1,10 @@
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 class Configs {
+
+    public static final int MAX_NUMBER_OF_PLAYERS = 5;
 
     // Sockets
     public static final String SERVER_HOST = "127.0.0.1";
@@ -29,6 +33,14 @@ class Configs {
 
     // Player view
     public static final Dimension CARD_SIZE = new Dimension(60, 90);
+    public static final Map<Integer, Point> PLAYER_SLOT_LOCATIONS = new HashMap<Integer, Point>() {{
+        put(1, new Point(8, 240));
+        put(2, new Point(256, 306));
+        put(3, new Point(524, 324));
+        put(4, new Point(780, 306));
+        put(5, new Point(1038, 240));
+    }};
+    public static final Point DEALER_SLOT_LOCATION = new Point(308, 100);
 
     private Configs() {
     }

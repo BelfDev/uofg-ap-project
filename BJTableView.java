@@ -1,37 +1,52 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 class BJTableView extends JPanel {
 
+    private List<PlayerView> playerViews;
     private Image backgroundImage;
 
+    private DealerView dealerView;
+
     public BJTableView() {
-        backgroundImage = Utils.loadImage("assets/bj-table.png");
+        this.playerViews = new ArrayList<>();
+        this.backgroundImage = Utils.loadImage("assets/bj-table.png");
         this.setLayout(null);
+        addDealer();
+    }
 
-        DealerView dealer = new DealerView();
+    public void addPlayer(String name, int slot) {
+        if (slot <= Configs.MAX_NUMBER_OF_PLAYERS) {
+            PlayerView playerView = new PlayerView(slot);
+            if (name != null) {
+                playerView.setName(name);
+            }
+            playerViews.add(playerView);
+            Point playerLocation = Configs.PLAYER_SLOT_LOCATIONS.get(slot);
+            playerView.setLocation(playerLocation);
+            add(playerView);
+            revalidate();
+            repaint();
+        }
+    }
 
-        dealer.setLocation(308, 100);
+    public void removePlayer(int slot) {
+        PlayerView playerView = playerViews.stream()
+                .filter(p -> p.getSlot() == slot)
+                .findFirst()
+                .orElse(null);
+        if (playerView != null) {
+            remove(playerView);
+            playerViews.remove(playerView);
+        }
+    }
 
-        PlayerView p1 = new PlayerView();
-        PlayerView p2 = new PlayerView();
-        PlayerView p3 = new PlayerView();
-        PlayerView p4 = new PlayerView();
-        PlayerView p5 = new PlayerView();
-
-        p1.setLocation(8, 240);
-        p2.setLocation(265, 306);
-        p3.setLocation(524, 324);
-        p4.setLocation(780, 306);
-        p5.setLocation(1038, 240);
-
-
-        add(dealer);
-        add(p1);
-        add(p2);
-        add(p3);
-        add(p4);
-        add(p5);
+    private void addDealer() {
+        dealerView = new DealerView();
+        dealerView.setLocation(Configs.DEALER_SLOT_LOCATION);
+        add(dealerView);
     }
 
     public void paintComponent(Graphics g) {

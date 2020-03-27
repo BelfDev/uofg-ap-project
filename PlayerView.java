@@ -7,14 +7,16 @@ public class PlayerView extends JPanel {
     private static final int SCORE_LABEL_SIZE = 24;
     private static final int SCORE_LABEL_LEFT_MARGIN = 8;
     private static final int BET_CONTAINER_TOP_MARGIN = 32;
-    private static final int BET_CONTAINER_HEIGHT = 40;
+    private static final int BET_CONTAINER_HEIGHT = 60;
 
     private int cardsCounter;
+    private int slot;
     private JPanel cardsContainer;
     private JLabel scoreLabel;
+    private JLabel nameLabel;
 
-
-    public PlayerView() {
+    public PlayerView(int slot) {
+        this.slot = slot;
         this.setLayout(null);
         int width = Configs.CARD_SIZE.width + CARD_INSET * 4 + SCORE_LABEL_SIZE + SCORE_LABEL_LEFT_MARGIN;
         this.setSize(width, Configs.CARD_SIZE.height + BET_CONTAINER_HEIGHT + BET_CONTAINER_TOP_MARGIN);
@@ -30,6 +32,26 @@ public class PlayerView extends JPanel {
         setOpaque(false);
     }
 
+    public int getSlot() {
+        return slot;
+    }
+
+    public int getCardsCounter() {
+        return cardsCounter;
+    }
+
+    public JPanel getCardsContainer() {
+        return cardsContainer;
+    }
+
+    public JLabel getNameLabel() {
+        return nameLabel;
+    }
+
+    public void setName(String name) {
+        this.nameLabel.setText(name);
+    }
+
     private JPanel createBetContainer() {
         JPanel container = new JPanel(new BorderLayout());
         container.setSize(this.getWidth(), BET_CONTAINER_HEIGHT);
@@ -39,14 +61,19 @@ public class PlayerView extends JPanel {
         betLabel.setHorizontalAlignment(JLabel.CENTER);
         betLabel.setForeground(Color.white);
 
-        JLabel betValueLabel = new JLabel("100");
+        JLabel betValueLabel = new JLabel("0");
         betValueLabel.setHorizontalAlignment(JLabel.CENTER);
         Font f = Utils.getBoldFont(betValueLabel.getFont(), 16);
         betValueLabel.setFont(f);
         betValueLabel.setForeground(Color.white);
 
+        nameLabel = new JLabel("You");
+        nameLabel.setHorizontalAlignment(JLabel.CENTER);
+        nameLabel.setForeground(Color.orange);
+
         container.add(betLabel, BorderLayout.NORTH);
         container.add(betValueLabel, BorderLayout.CENTER);
+        container.add(nameLabel, BorderLayout.SOUTH);
 
         container.setOpaque(false);
 
@@ -60,12 +87,12 @@ public class PlayerView extends JPanel {
         cardsContainer.setOpaque(false);
 
         scoreLabel = new CardScoreView(new Dimension(SCORE_LABEL_SIZE, SCORE_LABEL_SIZE));
-        scoreLabel.setText("2");
+//        scoreLabel.setText("2");
         scoreLabel.setLocation(cardsContainer.getWidth() - SCORE_LABEL_SIZE, 0);
 
-        addCard(new CardView("assets/card_2_c_ic"));
-        addCard(new CardView("assets/card_10_d_ic"));
-        addCard(new CardView("assets/card_a_h_ic"));
+//        addCard(new CardView("assets/card_2_c_ic"));
+//        addCard(new CardView("assets/card_10_d_ic"));
+//        addCard(new CardView("assets/card_a_h_ic"));
 
         cardsContainer.add(scoreLabel);
 

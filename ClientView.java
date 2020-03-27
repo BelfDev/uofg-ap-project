@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.Set;
 
 class ClientView extends JFrame {
 
@@ -16,6 +17,10 @@ class ClientView extends JFrame {
 
     public void updateNumberOfPlayersLabel(String numberOfPlayers) {
         topBar.setPlayersValueLabelText(numberOfPlayers);
+    }
+
+    public void addNewPlayer(String name, int slot) {
+        mainContent.addPlayer(name, slot);
     }
 
     public void setActionListener(ActionListener listener) {
