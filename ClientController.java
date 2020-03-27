@@ -20,6 +20,12 @@ class ClientController implements StateListener, ActionListener {
         this.activePlayer = null;
         this.playerList = null;
         view.setActionListener(this);
+        view.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                quitGame();
+            }
+        });
     }
 
     @Override
@@ -62,12 +68,13 @@ class ClientController implements StateListener, ActionListener {
         System.out.println(action.toString());
         switch (action) {
             case QUIT_GAME:
-                quitGame();
+                view.dispatchEvent(new WindowEvent(view, WindowEvent.WINDOW_CLOSING));
                 break;
             default:
                 break;
         }
     }
+
 
     private void quitGame() {
         // Confirms whether the user want to quit the game
@@ -77,8 +84,8 @@ class ClientController implements StateListener, ActionListener {
             requestSender.sendRequest(
                     new ClientRequest.Builder(Command.QUIT, activePlayer.getId())
                             .build());
-            // Closes the application
-            view.dispatchEvent(new WindowEvent(view, WindowEvent.WINDOW_CLOSING));
+            // Exit the application
+            System.exit(0);
         }
     }
 

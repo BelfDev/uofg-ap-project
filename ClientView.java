@@ -53,7 +53,8 @@ class ClientView extends JFrame {
         this.setResizable(false);
         // Sets the window location to the center of the screen
         this.setLocationRelativeTo(null);
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        // Prevent the window from closing unless the user confirms the exit
+        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 
     private void setupPanels() {
