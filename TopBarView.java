@@ -49,6 +49,10 @@ class TopBarView extends JPanel {
         this.balanceValueLabel.setText(value);
     }
 
+    public void setFeedback(String feedback) {
+        this.feedbackLabel.setText(feedback);
+    }
+
     // Content setup
 
     private void addPanels() {
@@ -74,7 +78,7 @@ class TopBarView extends JPanel {
         feedbackContainer.setBorder(BorderFactory.createMatteBorder(0, 8, 0, 8, Configs.TOP_BAR_BORDER_COLOR));
         feedbackContainer.setOpaque(false);
 
-        feedbackLabel = createLabel("This will be a nice text");
+        feedbackLabel = createLabel("Welcome to the Black Jack game!");
         feedbackContainer.add(feedbackLabel);
 
         // Players panel

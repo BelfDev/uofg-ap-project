@@ -70,11 +70,25 @@ class ClientController implements StateListener, ActionListener {
             case QUIT_GAME:
                 view.dispatchEvent(new WindowEvent(view, WindowEvent.WINDOW_CLOSING));
                 break;
+            case BET:
+                JButton chipButton = (JButton) e.getSource();
+                int value = Integer.parseInt(chipButton.getName());
+                placeBet(value);
+                break;
+            case HIT:
+                requestCard();
+                break;
             default:
                 break;
         }
     }
 
+    private void placeBet(int value) {
+        int currentBet = activePlayer.getRoundBet();
+        int newBet = currentBet + value;
+        activePlayer.setRoundBet(newBet);
+        view.setBet(newBet, activePlayer.getSlot());
+    }
 
     private void quitGame() {
         // Confirms whether the user want to quit the game
@@ -87,6 +101,10 @@ class ClientController implements StateListener, ActionListener {
             // Exit the application
             System.exit(0);
         }
+    }
+
+    private void requestCard() {
+        // TODO: Create hit request
     }
 
     private void updatePlayerViews() {

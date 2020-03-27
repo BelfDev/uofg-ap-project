@@ -1,8 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 class ClientView extends JFrame {
 
@@ -28,6 +30,10 @@ class ClientView extends JFrame {
         topBar.setBalanceValue(balance);
     }
 
+    public void setFeedback(String feedback) {
+        topBar.setFeedback(feedback);
+    }
+
     public void updateNumberOfPlayersLabel(String numberOfPlayers) {
         topBar.setPlayersValueLabelText(numberOfPlayers);
     }
@@ -48,6 +54,18 @@ class ClientView extends JFrame {
         JButton quitButton = bottomBar.getQuitButton();
         quitButton.setActionCommand(ClientActionType.QUIT_GAME.toString());
         quitButton.addActionListener(listener);
+
+        setBetListeners(listener);
+
+        JButton hitButton = bottomBar.getHitButton();
+        hitButton.setActionCommand(ClientActionType.HIT.toString());
+        hitButton.addActionListener(listener);
+    }
+
+    public void setBet(int value, int playerSlot) {
+        String betValue = String.valueOf(value);
+        PlayerView playerView = playerViewMap.get(playerSlot);
+        playerView.setBetValue(betValue);
     }
 
     private void setupWindow() {
@@ -69,6 +87,13 @@ class ClientView extends JFrame {
         this.add(topBar, BorderLayout.NORTH);
         this.add(mainContent, BorderLayout.CENTER);
         this.add(bottomBar, BorderLayout.SOUTH);
+    }
+
+    private void setBetListeners(ActionListener listener) {
+        bottomBar.getChipButtons().forEach(chip -> {
+            chip.setActionCommand(ClientActionType.BET.toString());
+            chip.addActionListener(listener);
+        });
     }
 
 }

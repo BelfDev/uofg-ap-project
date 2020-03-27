@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class encapsulates the content of the BottomBarView.
@@ -16,7 +18,7 @@ class BottomBarView extends JPanel {
     private JButton greenChipButton;
     private JButton blueChipButton;
 
-    private JButton dealButton;
+    private JButton hitButton;
     private JButton standButton;
     private JButton doubleButton;
     private JButton splitButton;
@@ -38,24 +40,17 @@ class BottomBarView extends JPanel {
 
     // Getters
 
-    public JButton getYellowChipButton() {
-        return yellowChipButton;
+    public List<JButton> getChipButtons() {
+        return new ArrayList<JButton>() {{
+            add(yellowChipButton);
+            add(redChipButton);
+            add(greenChipButton);
+            add(blueChipButton);
+        }};
     }
 
-    public JButton getRedChipButton() {
-        return redChipButton;
-    }
-
-    public JButton getGreenChipButton() {
-        return greenChipButton;
-    }
-
-    public JButton getBlueChipButton() {
-        return blueChipButton;
-    }
-
-    public JButton getDealButton() {
-        return dealButton;
+    public JButton getHitButton() {
+        return hitButton;
     }
 
     public JButton getStandButton() {
@@ -132,13 +127,13 @@ class BottomBarView extends JPanel {
         buttonsContainer.setOpaque(false);
 
         // Creates the action buttons
-        dealButton = createActionButton("DEAL");
+        hitButton = createActionButton("HIT");
         standButton = createActionButton("STAND");
         doubleButton = createActionButton("DOUBLE");
         splitButton = createActionButton("SPLIT");
 
         final int buttonMargin = 16;
-        buttonsContainer.add(dealButton);
+        buttonsContainer.add(hitButton);
         buttonsContainer.add(Box.createHorizontalStrut(buttonMargin));
         buttonsContainer.add(standButton);
         buttonsContainer.add(Box.createHorizontalStrut(buttonMargin));
@@ -177,6 +172,11 @@ class BottomBarView extends JPanel {
         redChipButton = createIconButton("assets/red_chip_ic.png");
         greenChipButton = createIconButton("assets/green_chip_ic.png");
         blueChipButton = createIconButton("assets/blue_chip_ic.png");
+
+        yellowChipButton.setName("1");
+        redChipButton.setName("4");
+        greenChipButton.setName("10");
+        blueChipButton.setName("20");
 
         chipPanel.add(yellowChipButton);
         chipPanel.add(redChipButton);

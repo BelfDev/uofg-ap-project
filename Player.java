@@ -13,6 +13,7 @@ public class Player implements Serializable {
     public Player(String id, Integer slot) {
         this.id = new AtomicReference<>(id);
         this.slot = new AtomicInteger(slot);
+        this.roundBet = new AtomicInteger(0);
     }
 
     public synchronized String getId() {
