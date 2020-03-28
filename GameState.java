@@ -12,7 +12,7 @@ public class GameState implements Serializable {
     private Stack<Integer> availableSlots;
 
     public GameState() {
-        this.playerMap = new ConcurrentHashMap<String, Player>();
+        this.playerMap = Collections.synchronizedMap(new HashMap<>());
         this.roundPhase = new AtomicReference<>(RoundPhase.INITIAL_BET);
         this.availableSlots = createSlots();
     }
