@@ -1,8 +1,10 @@
+import java.io.Serializable;
+
 /**
  * This class represents the PlayingCard model. It contains
  * the card's suit, value, and asset name.
  */
-public class PlayingCard {
+public class PlayingCard implements Serializable {
     private final SuitMark suit;
     private final String value;
     private final String assetName;
@@ -16,7 +18,7 @@ public class PlayingCard {
     public PlayingCard(SuitMark suit, String value) {
         this.suit = suit;
         this.value = value;
-        this.assetName = String.format("card_$s_$s_ic", value, suit.getFirstLetter());
+        this.assetName = String.format("assets/card_%s_%s_ic", value, suit.getFirstLetter());
     }
 
     public SuitMark getSuit() {
