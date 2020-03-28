@@ -15,6 +15,7 @@ public class Player implements Serializable {
     public Player(String id, Integer slot) {
         this.id = new AtomicReference<>(id);
         this.slot = new AtomicInteger(slot);
+        this.balance = new AtomicInteger(Configs.PLAYER_INITIAL_BALANCE);
         this.roundBet = new AtomicInteger(0);
         this.isBottleneck = new AtomicBoolean(true);
     }
@@ -35,12 +36,16 @@ public class Player implements Serializable {
         return balance.get();
     }
 
+    public synchronized void setBalance(int balance) {
+        this.balance.set(balance);
+    }
+
     public boolean isBottleneck() {
         return isBottleneck.get();
     }
 
-    public void setRoundBet(int roundBet) {
-        this.roundBet.set(roundBet);
+    public void increaseRoundBet(int value) {
+        this.roundBet.getAndAdd(value);
     }
 
     public void setIsBottleneck(boolean isBottleneck) {

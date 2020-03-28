@@ -1,5 +1,3 @@
-import java.util.List;
-
 class BlackJackProtocol implements ApplicationProtocol {
 
     private GameState gameState;
@@ -22,7 +20,9 @@ class BlackJackProtocol implements ApplicationProtocol {
                 System.out.println(feedback);
                 break;
             case BET:
-                requestPlayer.setRoundBet((Integer) request.getPayload().get("bet"));
+                int newBet = (Integer) request.getPayload().get("bet");
+                requestPlayer.increaseRoundBet(newBet);
+                requestPlayer.setBalance(requestPlayer.getBalance() - newBet);
                 break;
             case HIT:
                 if (phase.equals(RoundPhase.INITIAL_BET)) {

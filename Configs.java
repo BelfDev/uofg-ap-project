@@ -42,6 +42,9 @@ class Configs {
     }};
     public static final Point DEALER_SLOT_LOCATION = new Point(308, 100);
 
+    // Player model
+    public static final int PLAYER_INITIAL_BALANCE = 1000;
+    
     private Configs() {
     }
 }

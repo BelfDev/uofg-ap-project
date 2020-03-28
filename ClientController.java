@@ -84,13 +84,16 @@ class ClientController implements StateListener, ActionListener {
     }
 
     private void placeBet(int value) {
-        int currentBet = activePlayer.getRoundBet();
-        int newBet = currentBet + value;
-        activePlayer.setRoundBet(newBet);
-        view.setBet(newBet, activePlayer.getSlot());
-        requestSender.sendRequest(new ClientRequest.Builder(Command.BET, activePlayer.getId())
-                .withData("bet", newBet)
-                .build());
+        int newRoundBet = activePlayer.getRoundBet() + value;
+        int balance = activePlayer.getBalance();
+        if (newRoundBet <= balance) {
+            activePlayer.increaseRoundBet(value);
+            requestSender.sendRequest(new ClientRequest.Builder(Command.BET, activePlayer.getId())
+                    .withData("bet", value)
+                    .build());
+        } else {
+            view.setFeedback("You don't have enough credits to place this bet!");
+        }
     }
 
     private void quitGame() {
@@ -117,6 +120,12 @@ class ClientController implements StateListener, ActionListener {
                 PlayerView playerView = view.getPlayerViewMap().get(player.getSlot());
                 // Updates the bets
                 playerView.setBetValue(String.valueOf(player.getRoundBet()));
+
+                // Updates the view related to the active player
+                if (player.getId().equals(activePlayer.getId())) {
+                    // Updates the balance
+                    view.setBalance(String.valueOf(player.getBalance()));
+                }
                 // TODO: Update some player view
             } else if (!player.getId().equals(activePlayer.getId())) {
                 // Add a new player view
