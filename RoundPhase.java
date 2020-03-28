@@ -1,7 +1,8 @@
 import java.util.Arrays;
 
 public enum RoundPhase {
-    INITIAL_BET(0);
+    INITIAL_BET(0),
+    CARD_DEAL(1);
 
     private int order;
 

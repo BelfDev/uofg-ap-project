@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -9,11 +10,13 @@ public class Player implements Serializable {
 
     private AtomicInteger balance;
     private AtomicInteger roundBet;
+    private AtomicBoolean isBottleneck;
 
     public Player(String id, Integer slot) {
         this.id = new AtomicReference<>(id);
         this.slot = new AtomicInteger(slot);
         this.roundBet = new AtomicInteger(0);
+        this.isBottleneck = new AtomicBoolean(true);
     }
 
     public synchronized String getId() {
@@ -32,8 +35,15 @@ public class Player implements Serializable {
         return balance.get();
     }
 
+    public boolean isBottleneck() {
+        return isBottleneck.get();
+    }
+
     public void setRoundBet(int roundBet) {
         this.roundBet.set(roundBet);
     }
 
+    public void setIsBottleneck(boolean isBottleneck) {
+        this.isBottleneck.set(isBottleneck);
+    }
 }

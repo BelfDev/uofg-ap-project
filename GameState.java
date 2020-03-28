@@ -1,20 +1,18 @@
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class GameState implements Serializable {
 
     private AtomicReference<RoundPhase> roundPhase;
     // Indicates the game bottleneck (i.e. which player everyone is waiting for)
-    private AtomicReference<String> bottleneck;
-
     private List<Player> players;
     private Stack<Integer> availableSlots;
 
     public GameState() {
         this.players = Collections.synchronizedList(new ArrayList<>());
         this.roundPhase = new AtomicReference<>(RoundPhase.INITIAL_BET);
-        this.bottleneck = null;
         this.availableSlots = createSlots();
     }
 
@@ -22,8 +20,25 @@ public class GameState implements Serializable {
         return players.size();
     }
 
+    public RoundPhase getRoundPhase() {
+        return roundPhase.get();
+    }
+
     public List<Player> getPlayers() {
         return players;
+    }
+
+    public synchronized Player getPlayer(String id) {
+        return players.stream()
+                .filter(p -> p.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public synchronized List<Player> getBottlenecks() {
+        return players.stream()
+                .filter(Player::isBottleneck)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public synchronized void addNewPlayer() {

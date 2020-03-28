@@ -6,7 +6,7 @@ public class ClientRequest implements Serializable {
 
     private Command command;
     private String playerId;
-    private Map<String, String> payload;
+    private Map<String, Object> payload;
 
     private ClientRequest() {
     }
@@ -19,7 +19,7 @@ public class ClientRequest implements Serializable {
         return playerId;
     }
 
-    public Map<String, String> getPayload() {
+    public Map<String, Object> getPayload() {
         return payload;
     }
 
@@ -27,7 +27,7 @@ public class ClientRequest implements Serializable {
 
         private Command command;
         private String playerId;
-        private Map<String, String> payload;
+        private Map<String, Object> payload;
 
         public Builder(Command command, String playerId) {
             this.command = command;
@@ -35,7 +35,7 @@ public class ClientRequest implements Serializable {
             this.payload = new HashMap<>();
         }
 
-        public Builder withData(String key, String value) {
+        public Builder withData(String key, Object value) {
             payload.put(key, value);
             return this;
         }

@@ -88,6 +88,9 @@ class ClientController implements StateListener, ActionListener {
         int newBet = currentBet + value;
         activePlayer.setRoundBet(newBet);
         view.setBet(newBet, activePlayer.getSlot());
+        requestSender.sendRequest(new ClientRequest.Builder(Command.BET, activePlayer.getId())
+                .withData("bet", newBet)
+                .build());
     }
 
     private void quitGame() {
@@ -95,9 +98,7 @@ class ClientController implements StateListener, ActionListener {
         int input = JOptionPane.showConfirmDialog(view, "Do you want to quit the game?");
         if (input == 0) {
             // Sends out a quit request to the server
-            requestSender.sendRequest(
-                    new ClientRequest.Builder(Command.QUIT, activePlayer.getId())
-                            .build());
+            requestSender.sendRequest(new ClientRequest.Builder(Command.QUIT, activePlayer.getId()).build());
             // Exit the application
             System.exit(0);
         }
@@ -105,12 +106,17 @@ class ClientController implements StateListener, ActionListener {
 
     private void requestCard() {
         // TODO: Create hit request
+        requestSender.sendRequest(new ClientRequest.Builder(Command.HIT, activePlayer.getId()).build());
     }
 
     private void updatePlayerViews() {
         for (Player player : playerList) {
             boolean hasPlayerView = view.getPlayerViewMap().containsKey(player.getSlot());
             if (hasPlayerView) {
+                // Retrieves player view
+                PlayerView playerView = view.getPlayerViewMap().get(player.getSlot());
+                // Updates the bets
+                playerView.setBetValue(String.valueOf(player.getRoundBet()));
                 // TODO: Update some player view
             } else if (!player.getId().equals(activePlayer.getId())) {
                 // Add a new player view
