@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * This class provides methods to fabricate playing cards decks.
@@ -27,6 +28,7 @@ public class PlayingCardFactory {
             deck.add(new PlayingCard(suit, "q"));
             deck.add(new PlayingCard(suit, "k"));
         }
+        Collections.shuffle(deck);
         return deck;
     }
 
