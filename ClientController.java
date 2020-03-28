@@ -52,10 +52,7 @@ class ClientController implements StateListener, ActionListener {
 
     private void updateDealerView(Dealer dealer) {
         DealerView dealerView = view.getDealerView();
-        for (PlayingCard card : dealer.getCards()) {
-            CardView cardView = new CardView(card.getAssetName());
-            dealerView.addCard(cardView);
-        }
+        updateCards(dealer, dealerView);
         dealerView.setScore(dealer.getHandScore());
     }
 
@@ -134,19 +131,30 @@ class ClientController implements StateListener, ActionListener {
                 PlayerView playerView = view.getPlayerViewMap().get(player.getSlot());
                 // Updates the bets
                 playerView.setBetValue(String.valueOf(player.getRoundBet()));
-
+                // Update cards
+                updateCards(player, playerView);
                 // Updates the view related to the active player
                 if (player.getId().equals(activePlayer.getId())) {
                     // Updates the balance
                     view.setBalance(String.valueOf(player.getBalance()));
                 }
-                // TODO: Update some player view
             } else if (!player.getId().equals(activePlayer.getId())) {
                 // Add a new player view
                 view.addNewPlayer("Someone", player.getSlot());
             }
         }
 
+    }
+
+    private void updateCards(Player player, CardReceiver receiver) {
+        List<PlayingCard> cards = player.getCards();
+        int numberOfCards = receiver.getNumberOfCards();
+        if (numberOfCards < cards.size()) {
+            for (int i = numberOfCards; i < cards.size(); i++) {
+                CardView cardView = new CardView(cards.get(i).getAssetName());
+                receiver.addCard(cardView);
+            }
+        }
     }
 
     private void removeQuitPlayers(List<Player> previousPlayers) {

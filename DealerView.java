@@ -1,22 +1,26 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents the black jack dealer. It displays
  * the dealer's cards and score.
  */
-public class DealerView extends JPanel {
+public class DealerView extends JPanel implements CardReceiver {
 
     private static final int WIDTH = 600;
 
     private JPanel cardsContainer;
     private CardScoreView scoreView;
     private JPanel rightBorder;
+    private List<CardView> cards;
 
     /**
      * Creates a DealerView that displays the Dealer's cards and score.
      */
     public DealerView() {
+        this.cards = new ArrayList<>();
         // Customizes the root container
         this.setSize(WIDTH, 2 * Configs.CARD_SIZE.height);
         BoxLayout boxLayout = new BoxLayout(this, BoxLayout.Y_AXIS);
@@ -44,13 +48,29 @@ public class DealerView extends JPanel {
         repaint();
     }
 
+    @Override
+    public int getNumberOfCards() {
+        return cards.size();
+    }
+
+    @Override
+    public void removeCards() {
+        this.cardsContainer.removeAll();
+        this.cardsContainer = createCardsContainer();
+        this.cards = new ArrayList<>();
+        revalidate();
+        repaint();
+    }
+
     /**
      * Adds a CardView to the DealerView. The position is rearranged
      * automatically.
      *
      * @param card the CardView to be added.
      */
+    @Override
     public void addCard(CardView card) {
+        cards.add(card);
         cardsContainer.add(card);
         cardsContainer.add(Box.createRigidArea(new Dimension(8, 0)));
         cardsContainer.add(rightBorder);

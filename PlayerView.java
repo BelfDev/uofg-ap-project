@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 
-public class PlayerView extends JPanel {
+public class PlayerView extends JPanel implements CardReceiver {
 
     private static final int CARD_INSET = 20;
     private static final int SCORE_LABEL_SIZE = 24;
@@ -35,10 +35,6 @@ public class PlayerView extends JPanel {
 
     public int getSlot() {
         return slot;
-    }
-
-    public int getCardsCounter() {
-        return cardsCounter;
     }
 
     public JPanel getCardsContainer() {
@@ -95,16 +91,18 @@ public class PlayerView extends JPanel {
         scoreLabel.setLocation(cardsContainer.getWidth() - SCORE_LABEL_SIZE, 0);
         scoreLabel.setVisible(false);
 
-//        addCard(new CardView("assets/card_2_c_ic"));
-//        addCard(new CardView("assets/card_10_d_ic"));
-//        addCard(new CardView("assets/card_a_h_ic"));
-
         cardsContainer.add(scoreLabel);
 
         return cardsContainer;
     }
 
-    private void addCard(CardView card) {
+    @Override
+    public int getNumberOfCards() {
+        return cardsCounter;
+    }
+
+    @Override
+    public void addCard(CardView card) {
         int width = cardsContainer.getWidth();
         int height = cardsContainer.getHeight();
         // Adapt cardsContainer and PlayerView sizes
@@ -120,6 +118,14 @@ public class PlayerView extends JPanel {
         // Bring last card to front
         cardsContainer.setComponentZOrder(card, 0);
         cardsCounter++;
+    }
+
+    @Override
+    public void removeCards() {
+        this.cardsContainer.removeAll();
+        this.cardsContainer = createCardsContainer();
+        revalidate();
+        repaint();
     }
 
 }
