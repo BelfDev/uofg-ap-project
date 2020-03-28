@@ -1,5 +1,6 @@
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -7,36 +8,34 @@ public class GameState implements Serializable {
 
     private AtomicReference<RoundPhase> roundPhase;
     // Indicates the game bottleneck (i.e. which player everyone is waiting for)
-    private List<Player> players;
+    private Map<String, Player> playerMap;
     private Stack<Integer> availableSlots;
 
     public GameState() {
-        this.players = Collections.synchronizedList(new ArrayList<>());
+        this.playerMap = new ConcurrentHashMap<String, Player>();
         this.roundPhase = new AtomicReference<>(RoundPhase.INITIAL_BET);
         this.availableSlots = createSlots();
     }
 
-    public int getNumberOfPlayers() {
-        return players.size();
+    public synchronized int getNumberOfPlayers() {
+        return playerMap.size();
     }
 
     public RoundPhase getRoundPhase() {
         return roundPhase.get();
     }
 
-    public List<Player> getPlayers() {
-        return players;
+    public synchronized List<Player> getPlayers() {
+        return new ArrayList<>(playerMap.values());
     }
 
     public synchronized Player getPlayer(String id) {
-        return players.stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        if (id == null) return null;
+        return playerMap.getOrDefault(id, null);
     }
 
     public synchronized List<Player> getBottlenecks() {
-        return players.stream()
+        return playerMap.values().stream()
                 .filter(Player::isBottleneck)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -45,17 +44,14 @@ public class GameState implements Serializable {
         String playerId = UUID.randomUUID().toString();
         Integer slot = availableSlots.pop();
         Player player = new Player(playerId, slot);
-        players.add(player);
+        playerMap.put(playerId, player);
     }
 
     public synchronized void removePlayer(String id) {
-        Player player = players.stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        Player player = playerMap.get(id);
         if (player != null) {
             int newAvailableSlot = player.getSlot();
-            players.remove(player);
+            playerMap.remove(id);
             availableSlots.add(newAvailableSlot);
         }
     }
@@ -77,11 +73,12 @@ public class GameState implements Serializable {
 
     @Override
     public String toString() {
-        return " GameState {" +
-                "\n\troundPhase = " + roundPhase.toString() +
-                "\n\tnumberOfPlayers = " + players.size() +
-                "\n\tplayers=" + players +
-                "\n}";
+        return "GameState{" +
+                "\nnumberOfPlayers=" + getNumberOfPlayers() +
+                ",\nroundPhase=" + roundPhase +
+                ",\nplayerMap=" + playerMap +
+                ",\navailableSlots=" + availableSlots +
+                '}';
     }
 
 }
