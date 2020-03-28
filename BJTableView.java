@@ -17,6 +17,10 @@ class BJTableView extends JPanel {
         addDealer();
     }
 
+    public DealerView getDealerView() {
+        return dealerView;
+    }
+
     public PlayerView addPlayer(String name, int slot) {
         if (slot <= Configs.MAX_NUMBER_OF_PLAYERS) {
             PlayerView playerView = new PlayerView(slot);

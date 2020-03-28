@@ -72,7 +72,7 @@ public class PlayerView extends JPanel {
         betValueLabel.setFont(f);
         betValueLabel.setForeground(Color.white);
 
-        nameLabel = new JLabel("You");
+        nameLabel = new JLabel();
         nameLabel.setHorizontalAlignment(JLabel.CENTER);
         nameLabel.setForeground(Color.orange);
 

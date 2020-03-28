@@ -27,11 +27,6 @@ public class DealerView extends JPanel {
         cardsContainer = createCardsContainer();
         JPanel scoreContainer = createScoreContainer();
 
-        addCard(new CardView("assets/card_2_c_ic"));
-        addCard(new CardView("assets/card_2_c_ic"));
-        addCard(new CardView("assets/card_2_c_ic"));
-        addCard(new CardView("assets/card_2_c_ic"));
-
         this.add(cardsContainer);
         this.add(scoreContainer);
     }
@@ -40,6 +35,13 @@ public class DealerView extends JPanel {
 
     public CardScoreView getScoreView() {
         return scoreView;
+    }
+
+    public void setScore(int value) {
+        this.scoreView.setText(String.valueOf(value));
+        this.scoreView.setVisible(value > 0);
+        revalidate();
+        repaint();
     }
 
     /**
@@ -52,6 +54,8 @@ public class DealerView extends JPanel {
         cardsContainer.add(card);
         cardsContainer.add(Box.createRigidArea(new Dimension(8, 0)));
         cardsContainer.add(rightBorder);
+        revalidate();
+        repaint();
     }
 
     // Content setup

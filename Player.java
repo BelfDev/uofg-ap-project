@@ -1,4 +1,7 @@
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -11,6 +14,9 @@ public class Player implements Serializable {
     private AtomicInteger balance;
     private AtomicInteger roundBet;
     private AtomicBoolean isBottleneck;
+    private AtomicInteger handScore;
+
+    private List<PlayingCard> cards;
 
     public Player(String id, Integer slot) {
         this.id = new AtomicReference<>(id);
@@ -18,25 +24,35 @@ public class Player implements Serializable {
         this.balance = new AtomicInteger(Configs.PLAYER_INITIAL_BALANCE);
         this.roundBet = new AtomicInteger(0);
         this.isBottleneck = new AtomicBoolean(true);
+        this.handScore = new AtomicInteger(0);
+        this.cards = Collections.synchronizedList(new ArrayList<>());
     }
 
-    public synchronized String getId() {
+    public String getId() {
         return id.get();
     }
 
-    public synchronized int getSlot() {
+    public int getSlot() {
         return slot.get();
     }
 
-    public synchronized int getRoundBet() {
+    public int getRoundBet() {
         return roundBet.get();
     }
 
-    public synchronized int getBalance() {
+    public int getHandScore() {
+        return handScore.get();
+    }
+
+    public int getBalance() {
         return balance.get();
     }
 
-    public synchronized void setBalance(int balance) {
+    public List<PlayingCard> getCards() {
+        return cards;
+    }
+
+    public void setBalance(int balance) {
         this.balance.set(balance);
     }
 
@@ -51,4 +67,32 @@ public class Player implements Serializable {
     public void setIsBottleneck(boolean isBottleneck) {
         this.isBottleneck.set(isBottleneck);
     }
+
+    public synchronized void addCard(PlayingCard card) {
+        int score = this.handScore.get();
+        score = calculateScore(card, score);
+        this.handScore.getAndAdd(score);
+        this.cards.add(card);
+    }
+
+    public synchronized void removeAllCards() {
+        this.handScore.set(0);
+        this.cards = Collections.synchronizedList(new ArrayList<>());
+    }
+
+    private int calculateScore(PlayingCard card, int score) {
+        if (card.getValue().equals("a")) {
+            if (((score + 10) > 21)) {
+                score += 1;
+            } else {
+                score += 11;
+            }
+        } else if (card.getValue().equals("j") || card.getValue().equals("q") || card.getValue().equals("k")) {
+            score += 10;
+        } else {
+            score += Integer.parseInt(card.getValue());
+        }
+        return score;
+    }
+
 }

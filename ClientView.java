@@ -26,6 +26,10 @@ class ClientView extends JFrame {
         return playerViewMap;
     }
 
+    public DealerView getDealerView() {
+        return mainContent.getDealerView();
+    }
+
     public void setBalance(String balance) {
         topBar.setBalanceValue(balance);
     }

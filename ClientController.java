@@ -36,14 +36,27 @@ class ClientController implements StateListener, ActionListener {
         List<Player> previousPlayerState = playerList;
         // Updates the player state
         playerList = state.getPlayers();
+        System.out.println(playerList);
         // Initialized this client's player view
         initActivePlayerIfNeeded();
         // Updates the number of players
         updateNumberOfPlayersIfNeeded(previousPlayerState, state.getNumberOfPlayers());
         // Remove players who quit the game
         removeQuitPlayers(previousPlayerState);
+        // Update the dealer
+        updateDealerView(state.getDealer());
         // Updates the players views
         updatePlayerViews();
+
+    }
+
+    private void updateDealerView(Dealer dealer) {
+        DealerView dealerView = view.getDealerView();
+        for (PlayingCard card : dealer.getCards()) {
+            CardView cardView = new CardView(card.getAssetName());
+            dealerView.addCard(cardView);
+        }
+        dealerView.setScore(dealer.getHandScore());
     }
 
     private void updateNumberOfPlayersIfNeeded(List<Player> previousPlayerList, int currentNumberOfPlayers) {
@@ -114,6 +127,7 @@ class ClientController implements StateListener, ActionListener {
 
     private void updatePlayerViews() {
         for (Player player : playerList) {
+            System.out.println("\n\n PLAYER ID: " + player.getId() + "\n SLOT: " + player.getSlot());
             boolean hasPlayerView = view.getPlayerViewMap().containsKey(player.getSlot());
             if (hasPlayerView) {
                 // Retrieves player view

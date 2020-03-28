@@ -29,6 +29,7 @@ class BlackJackProtocol implements ApplicationProtocol {
                     requestPlayer.setIsBottleneck(false);
                     if (gameState.getBottlenecks().isEmpty()) {
                         gameState.advanceRound();
+                        gameState.dealCards();
                     }
                 }
                 break;

@@ -1,6 +1,5 @@
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -11,10 +10,15 @@ public class GameState implements Serializable {
     private Map<String, Player> playerMap;
     private Stack<Integer> availableSlots;
 
+    private AtomicReference<Dealer> dealer;
+    private List<PlayingCard> deck;
+
     public GameState() {
-        this.playerMap = Collections.synchronizedMap(new HashMap<>());
+        this.playerMap = Collections.synchronizedMap(new LinkedHashMap<>());
         this.roundPhase = new AtomicReference<>(RoundPhase.INITIAL_BET);
         this.availableSlots = createSlots();
+        this.dealer = new AtomicReference<>(new Dealer());
+        this.deck = Collections.synchronizedList(PlayingCardFactory.getPlayingCardsDeck());
     }
 
     public synchronized int getNumberOfPlayers() {
@@ -32,6 +36,10 @@ public class GameState implements Serializable {
     public synchronized Player getPlayer(String id) {
         if (id == null) return null;
         return playerMap.getOrDefault(id, null);
+    }
+
+    public Dealer getDealer() {
+        return dealer.get();
     }
 
     public synchronized List<Player> getBottlenecks() {
@@ -60,6 +68,18 @@ public class GameState implements Serializable {
         int currentOrder = roundPhase.get().getOrder();
         RoundPhase nextRoundPhase = RoundPhase.getRoundOfOrder(++currentOrder);
         roundPhase.set(nextRoundPhase);
+    }
+
+    public synchronized void dealCards() {
+        int numberOfCards = deck.size();
+        // Deals the initial dealer cards
+        Dealer d = dealer.get();
+        d.addCard(deck.get(--numberOfCards));
+        // Deals two cards for each player
+        for (Player player : getPlayers()) {
+            player.addCard(deck.get(--numberOfCards));
+            player.addCard(deck.get(--numberOfCards));
+        }
     }
 
     private Stack<Integer> createSlots() {
