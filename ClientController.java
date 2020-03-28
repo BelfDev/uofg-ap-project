@@ -44,15 +44,18 @@ class ClientController implements StateListener, ActionListener {
         // Remove players who quit the game
         removeQuitPlayers(previousPlayerState);
         // Update the dealer
-        updateDealerView(state.getDealer());
+        updateDealerView(state.getDealer(), state.getRoundPhase());
         // Updates the players views
         updatePlayerViews();
 
     }
 
-    private void updateDealerView(Dealer dealer) {
+    private void updateDealerView(Dealer dealer, RoundPhase phase) {
         DealerView dealerView = view.getDealerView();
         updateCards(dealer, dealerView);
+        if (phase == RoundPhase.CARD_DEAL) {
+            dealerView.addCard(new CardView("assets/card_cover"));
+        }
         dealerView.setScore(dealer.getHandScore());
     }
 
@@ -140,8 +143,11 @@ class ClientController implements StateListener, ActionListener {
                 }
             } else if (!player.getId().equals(activePlayer.getId())) {
                 // Add a new player view
-                view.addNewPlayer("Someone", player.getSlot());
+                PlayerView newPlayer = view.addNewPlayer("Someone", player.getSlot());
+                updateCards(player, newPlayer);
             }
+
+
         }
 
     }

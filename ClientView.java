@@ -42,11 +42,12 @@ class ClientView extends JFrame {
         topBar.setPlayersValueLabelText(numberOfPlayers);
     }
 
-    public void addNewPlayer(String name, int slot) {
+    public PlayerView addNewPlayer(String name, int slot) {
         PlayerView playerView = mainContent.addPlayer(name, slot);
         if (playerView != null) {
             playerViewMap.put(slot, playerView);
         }
+        return playerView;
     }
 
     public void removePlayer(int slot) {
