@@ -41,13 +41,13 @@ class ClientController implements StateListener, ActionListener {
         List<Player> previousPlayerState = playerList;
         // Updates the player state
         playerList = state.getPlayers();
-        // Initialized this client's player view
+        // Initializes this client's player view
         initActivePlayerIfNeeded();
         // Updates the number of players
         updateNumberOfPlayersIfNeeded(previousPlayerState, state.getNumberOfPlayers());
-        // Remove players who quit the game
+        // Removes players who quit the game
         removeQuitPlayers(previousPlayerState);
-        // Update the dealer
+        // Updates the dealer
         updateDealerView(state.getDealer());
         // Updates the players views
         updatePlayerViews();
@@ -143,6 +143,8 @@ class ClientController implements StateListener, ActionListener {
                 playerView.setBetValue(String.valueOf(player.getRoundBet()));
                 // Update cards
                 updateCards(player, playerView);
+                // Updates score label
+                playerView.setScore(player.getHandScore());
                 // Updates the view related to the active player
                 if (player.getId().equals(activePlayer.getId())) {
                     // Updates the balance

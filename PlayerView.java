@@ -120,10 +120,19 @@ public class PlayerView extends JPanel implements CardReceiver {
         cardsCounter++;
     }
 
+
     @Override
     public void removeCards() {
         this.cardsContainer.removeAll();
         this.cardsContainer = createCardsContainer();
+        revalidate();
+        repaint();
+    }
+
+    @Override
+    public void setScore(int value) {
+        this.scoreLabel.setText(String.valueOf(value));
+        this.scoreLabel.setVisible(value > 0);
         revalidate();
         repaint();
     }

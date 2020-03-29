@@ -41,6 +41,7 @@ public class DealerView extends JPanel implements CardReceiver {
         return scoreView;
     }
 
+    @Override
     public void setScore(int value) {
         this.scoreView.setText(String.valueOf(value));
         this.scoreView.setVisible(value > 0);

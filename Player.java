@@ -69,8 +69,7 @@ public class Player implements Serializable {
     }
 
     public synchronized void addCard(PlayingCard card) {
-        int score = this.handScore.get();
-        score = calculateScore(card, score);
+        int score = calculateScore(card);
         this.handScore.getAndAdd(score);
         this.cards.add(card);
     }
@@ -80,19 +79,31 @@ public class Player implements Serializable {
         this.cards = Collections.synchronizedList(new ArrayList<>());
     }
 
-    private int calculateScore(PlayingCard card, int score) {
+    private int calculateScore(PlayingCard card) {
+        int score = this.handScore.get();
         if (card.getValue().equals("a")) {
             if (((score + 10) > 21)) {
-                score += 1;
+                score = 1;
             } else {
-                score += 11;
+                score = 11;
             }
         } else if (card.getValue().equals("j") || card.getValue().equals("q") || card.getValue().equals("k")) {
-            score += 10;
+            score = 10;
         } else {
-            score += Integer.parseInt(card.getValue());
+            score = Integer.parseInt(card.getValue());
         }
         return score;
     }
 
+    @Override
+    public String toString() {
+        return "Player{" +
+                "id=" + id.get() +
+                ", slot=" + slot.get() +
+                ", balance=" + balance.get() +
+                ", roundBet=" + roundBet.get() +
+                ", isBottleneck=" + isBottleneck.get() +
+                ", handScore=" + handScore.get() +
+                '}';
+    }
 }
