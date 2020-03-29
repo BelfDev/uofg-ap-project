@@ -36,7 +36,6 @@ class ClientController implements StateListener, ActionListener {
         List<Player> previousPlayerState = playerList;
         // Updates the player state
         playerList = state.getPlayers();
-        System.out.println(playerList);
         // Initialized this client's player view
         initActivePlayerIfNeeded();
         // Updates the number of players
@@ -47,6 +46,8 @@ class ClientController implements StateListener, ActionListener {
         updateDealerView(state.getDealer(), state.getRoundPhase());
         // Updates the players views
         updatePlayerViews();
+        // Update feedback
+        view.setFeedback(state.getFeedbackText());
 
     }
 
@@ -146,7 +147,6 @@ class ClientController implements StateListener, ActionListener {
                 PlayerView newPlayer = view.addNewPlayer("Someone", player.getSlot());
                 updateCards(player, newPlayer);
             }
-
 
         }
 

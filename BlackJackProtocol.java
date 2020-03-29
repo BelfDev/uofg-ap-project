@@ -1,5 +1,7 @@
 class BlackJackProtocol implements ApplicationProtocol {
 
+    private static final String AWAITING_PLAYER_MESSAGE = "Awaiting for player in slot ";
+
     private GameState gameState;
 
     public BlackJackProtocol(GameState gameState) {
@@ -16,8 +18,11 @@ class BlackJackProtocol implements ApplicationProtocol {
                 break;
             case QUIT:
                 gameState.removePlayer(request.getPlayerId());
-                String feedback = String.format("Player %s has left the game", request.getPlayerId());
-                System.out.println(feedback);
+                System.out.println(String.format("Player %s has left the game", request.getPlayerId()));
+                if (phase.equals(RoundPhase.CARD_DEAL)) {
+                    Player bottleneck = gameState.getBottleneck();
+                    gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + bottleneck.getSlot());
+                }
                 break;
             case BET:
                 int newBet = (Integer) request.getPayload().get("bet");
@@ -30,6 +35,8 @@ class BlackJackProtocol implements ApplicationProtocol {
                     if (gameState.getBottlenecks().isEmpty()) {
                         gameState.advanceRound();
                         gameState.dealCards();
+                        Player bottleneck = gameState.getBottleneck();
+                        gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + bottleneck.getSlot());
                     }
                 }
                 break;

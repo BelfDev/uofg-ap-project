@@ -9,16 +9,20 @@ public class GameState implements Serializable {
     // Indicates the game bottleneck (i.e. which player everyone is waiting for)
     private Map<String, Player> playerMap;
     private Stack<Integer> availableSlots;
+    private AtomicReference<Player> bottleneck;
 
     private AtomicReference<Dealer> dealer;
     private List<PlayingCard> deck;
+    private AtomicReference<String> feedbackText;
 
     public GameState() {
         this.playerMap = Collections.synchronizedMap(new LinkedHashMap<>());
         this.roundPhase = new AtomicReference<>(RoundPhase.INITIAL_BET);
         this.availableSlots = createSlots();
         this.dealer = new AtomicReference<>(new Dealer());
+        this.bottleneck = new AtomicReference<>(null);
         this.deck = Collections.synchronizedList(PlayingCardFactory.getPlayingCardsDeck());
+        this.feedbackText = new AtomicReference<>("Welcome to the Black Jack game!");
     }
 
     public synchronized int getNumberOfPlayers() {
@@ -42,10 +46,26 @@ public class GameState implements Serializable {
         return dealer.get();
     }
 
+    public Player getBottleneck() {
+        return bottleneck.get();
+    }
+
+    public void setBottleneck(Player player) {
+        this.bottleneck.set(player);
+    }
+
     public synchronized List<Player> getBottlenecks() {
         return playerMap.values().stream()
                 .filter(Player::isBottleneck)
                 .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public String getFeedbackText() {
+        return feedbackText.get();
+    }
+
+    public void setFeedbackText(String feedback) {
+        this.feedbackText.set(feedback);
     }
 
     public synchronized void addNewPlayer() {
@@ -61,6 +81,7 @@ public class GameState implements Serializable {
             int newAvailableSlot = player.getSlot();
             playerMap.remove(id);
             availableSlots.add(newAvailableSlot);
+            this.bottleneck.set(getNextBottleneck());
         }
     }
 
@@ -68,6 +89,15 @@ public class GameState implements Serializable {
         int currentOrder = roundPhase.get().getOrder();
         RoundPhase nextRoundPhase = RoundPhase.getRoundOfOrder(++currentOrder);
         roundPhase.set(nextRoundPhase);
+        playerMap.values().forEach(p -> p.setIsBottleneck(true));
+        this.bottleneck.set(getNextBottleneck());
+    }
+
+    public synchronized Player getNextBottleneck() {
+        return playerMap.values().stream()
+                .filter(Player::isBottleneck)
+                .max(Comparator.comparing(Player::getSlot))
+                .orElse(null);
     }
 
     public synchronized void dealCards() {
