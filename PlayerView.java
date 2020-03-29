@@ -143,6 +143,7 @@ public class PlayerView extends JPanel implements CardReceiver {
 
     @Override
     public void removeCards() {
+        this.cardsCounter = 0;
         this.cardsContainer.removeAll();
         this.cardsContainer = createCardsContainer();
         this.add(cardsContainer);
