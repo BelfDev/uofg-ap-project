@@ -16,8 +16,11 @@ public class PlayerView extends JPanel implements CardReceiver {
     private JLabel nameLabel;
     private JLabel betValueLabel;
 
+    private boolean isRedLineVisible;
+
     public PlayerView(int slot) {
         this.slot = slot;
+        this.isRedLineVisible = false;
         this.setLayout(null);
         int width = Configs.CARD_SIZE.width + CARD_INSET * 4 + SCORE_LABEL_SIZE + SCORE_LABEL_LEFT_MARGIN;
         this.setSize(width, Configs.CARD_SIZE.height + BET_CONTAINER_HEIGHT + BET_CONTAINER_TOP_MARGIN);
@@ -120,6 +123,21 @@ public class PlayerView extends JPanel implements CardReceiver {
         cardsCounter++;
     }
 
+    public void toggleRedLine() {
+        if (isRedLineVisible) {
+            cardsContainer.remove(0);
+            isRedLineVisible = false;
+        } else {
+            JPanel redPanel = new JPanel();
+            int width = (CARD_INSET * (cardsCounter - 1)) + Configs.CARD_SIZE.width;
+            redPanel.setBounds(0, cardsContainer.getHeight() / 2, width, 4);
+            redPanel.setBackground(Color.red);
+            cardsContainer.add(redPanel);
+            cardsContainer.setComponentZOrder(redPanel, 0);
+            revalidate();
+            repaint();
+        }
+    }
 
     @Override
     public void removeCards() {
