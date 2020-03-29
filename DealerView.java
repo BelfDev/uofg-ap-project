@@ -59,6 +59,7 @@ public class DealerView extends JPanel implements CardReceiver {
         this.cardsContainer.removeAll();
         this.cardsContainer = createCardsContainer();
         this.cards = new ArrayList<>();
+        this.add(cardsContainer);
         revalidate();
         repaint();
     }

@@ -121,6 +121,8 @@ public class PlayerView extends JPanel implements CardReceiver {
         // Bring last card to front
         cardsContainer.setComponentZOrder(card, 0);
         cardsCounter++;
+        revalidate();
+        repaint();
     }
 
     public void toggleRedLine() {
@@ -143,6 +145,7 @@ public class PlayerView extends JPanel implements CardReceiver {
     public void removeCards() {
         this.cardsContainer.removeAll();
         this.cardsContainer = createCardsContainer();
+        this.add(cardsContainer);
         revalidate();
         repaint();
     }

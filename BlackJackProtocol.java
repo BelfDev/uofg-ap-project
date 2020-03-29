@@ -1,6 +1,7 @@
 class BlackJackProtocol implements ApplicationProtocol {
 
     private static final String AWAITING_PLAYER_MESSAGE = "Awaiting for player in slot ";
+    private static final String AWAITING_FOR_BETS = "Please place your bets! ";
 
     private GameState gameState;
 
@@ -51,8 +52,13 @@ class BlackJackProtocol implements ApplicationProtocol {
                         requestPlayer.resetRoundBet();
                         // Updates the overall game state
                         Player nextBottleneck = gameState.getNextBottleneck();
-                        gameState.setBottleneck(nextBottleneck);
-                        gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + nextBottleneck.getSlot());
+                        if (nextBottleneck != null) {
+                            gameState.setBottleneck(nextBottleneck);
+                            gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + nextBottleneck.getSlot());
+                        } else {
+                            gameState.advanceRound();
+                            gameState.setFeedbackText(AWAITING_FOR_BETS);
+                        }
                     } else if (requestPlayer.getHandScore() == 21) {
                         // Updates the winner player
                         requestPlayer.setIsWinner(true);
@@ -61,8 +67,8 @@ class BlackJackProtocol implements ApplicationProtocol {
                         // Increases the player balance
                         requestPlayer.setBalance(simpleReward);
                         // Advances to a new round
-                        // TODO: Adjust new round when player wins
-                        // gameState.advanceRound();
+                        gameState.advanceRound();
+                        gameState.setFeedbackText(AWAITING_FOR_BETS);
                     }
                 }
                 break;

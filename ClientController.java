@@ -148,11 +148,8 @@ class ClientController implements StateListener, ActionListener {
                 updateCards(player, playerView);
                 // Updates score label
                 playerView.setScore(player.getHandScore());
-
-                if (player.isEliminated()) {
-                    playerView.toggleRedLine();
-                }
-
+                // Displays a red line in case the player is eliminated
+                if (player.isEliminated()) { playerView.toggleRedLine(); }
                 // Updates the view related to the active player
                 if (player.getId().equals(activePlayer.getId())) {
                     // Updates the balance
@@ -172,7 +169,10 @@ class ClientController implements StateListener, ActionListener {
     private void updateCards(Player player, CardReceiver receiver) {
         List<PlayingCard> cards = player.getCards();
         int numberOfCards = receiver.getNumberOfCards();
-        if (numberOfCards < cards.size()) {
+        if (roundPhase.equals(RoundPhase.INITIAL_BET) && numberOfCards > 0) {
+            // Remove player cards if the game was reset
+            receiver.removeCards();
+        } else if (numberOfCards < cards.size()) {
             for (int i = numberOfCards; i < cards.size(); i++) {
                 CardView cardView = new CardView(cards.get(i).getAssetName());
                 receiver.addCard(cardView);

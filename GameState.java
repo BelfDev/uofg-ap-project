@@ -1,4 +1,3 @@
-import javax.smartcardio.Card;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -87,11 +86,30 @@ public class GameState implements Serializable {
     }
 
     public synchronized void advanceRound() {
-        int currentOrder = roundPhase.get().getOrder();
-        RoundPhase nextRoundPhase = RoundPhase.getRoundOfOrder(++currentOrder);
+        RoundPhase nextRoundPhase;
+        nextRoundPhase = getNextRoundPhase();
         roundPhase.set(nextRoundPhase);
-        playerMap.values().forEach(p -> p.setIsBottleneck(true));
+        playerMap.values().forEach(p -> {
+                    p.setIsBottleneck(true);
+                    p.setIsEliminated(false);
+                    p.setIsWinner(false);
+                    if (nextRoundPhase == RoundPhase.INITIAL_BET) {
+                        p.removeAllCards();
+                    }
+                }
+        );
         this.bottleneck.set(getNextBottleneck());
+    }
+
+    private RoundPhase getNextRoundPhase() {
+        RoundPhase nextRoundPhase;
+        if (roundPhase.get() == RoundPhase.PLAYER_ACTION) {
+            nextRoundPhase = RoundPhase.INITIAL_BET;
+        } else {
+            int currentOrder = roundPhase.get().getOrder();
+            nextRoundPhase = RoundPhase.getRoundOfOrder(++currentOrder);
+        }
+        return nextRoundPhase;
     }
 
     public synchronized Player getNextBottleneck() {
@@ -101,7 +119,7 @@ public class GameState implements Serializable {
                 .orElse(null);
     }
 
-        public synchronized PlayingCard dealCard() {
+    public synchronized PlayingCard dealCard() {
         return deck.pop();
     }
 
