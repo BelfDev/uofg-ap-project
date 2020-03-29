@@ -109,7 +109,6 @@ public class DealerView extends JPanel implements CardReceiver {
         scoreView.setFont(Utils.getBoldFont(f, 16));
         scoreView.setForeground(Color.white);
         scoreView.setBackground(Color.black);
-        scoreView.setText("21");
         scoreView.setVisible(false);
 
         container.add(scoreView);
