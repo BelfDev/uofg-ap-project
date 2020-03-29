@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Stack;
 
 /**
  * This class provides methods to fabricate playing cards decks.
@@ -16,8 +17,8 @@ public class PlayingCardFactory {
      *
      * @return a deck with 52 cards.
      */
-    public static ArrayList<PlayingCard> getPlayingCardsDeck() {
-        ArrayList<PlayingCard> deck = new ArrayList<>();
+    public static Stack<PlayingCard> getPlayingCardsDeck() {
+        Stack<PlayingCard> deck = new Stack<>();
         for (SuitMark suit : SuitMark.values()) {
             deck.add(new PlayingCard(suit, "a"));
             for (int value = 2; value <= 10; value++) {

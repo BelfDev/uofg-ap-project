@@ -2,7 +2,7 @@ import java.util.Arrays;
 
 public enum RoundPhase {
     INITIAL_BET(0),
-    CARD_DEAL(1);
+    PLAYER_ACTION(1);
 
     private int order;
 

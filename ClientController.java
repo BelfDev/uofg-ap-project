@@ -58,7 +58,7 @@ class ClientController implements StateListener, ActionListener {
     private void updateDealerView(Dealer dealer) {
         DealerView dealerView = view.getDealerView();
         updateCards(dealer, dealerView);
-        if (roundPhase == RoundPhase.CARD_DEAL) {
+        if (roundPhase == RoundPhase.PLAYER_ACTION) {
             dealerView.addCard(new CardView("assets/card_cover"));
         }
         dealerView.setScore(dealer.getHandScore());

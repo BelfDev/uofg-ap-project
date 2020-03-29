@@ -12,6 +12,7 @@ class BlackJackProtocol implements ApplicationProtocol {
     public synchronized ServerResponse processInput(ClientRequest request) {
         Player requestPlayer = gameState.getPlayer(request.getPlayerId());
         RoundPhase phase = gameState.getRoundPhase();
+
         switch (request.getCommand()) {
             case JOIN:
                 gameState.addNewPlayer();
@@ -19,7 +20,7 @@ class BlackJackProtocol implements ApplicationProtocol {
             case QUIT:
                 gameState.removePlayer(request.getPlayerId());
                 System.out.println(String.format("Player %s has left the game", request.getPlayerId()));
-                if (phase.equals(RoundPhase.CARD_DEAL)) {
+                if (phase.equals(RoundPhase.PLAYER_ACTION)) {
                     Player bottleneck = gameState.getBottleneck();
                     gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + bottleneck.getSlot());
                 }
@@ -34,11 +35,14 @@ class BlackJackProtocol implements ApplicationProtocol {
                     requestPlayer.setIsBottleneck(false);
                     if (gameState.getBottlenecks().isEmpty()) {
                         gameState.advanceRound();
-                        gameState.dealCards();
-                        Player bottleneck = gameState.getBottleneck();
-                        gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + bottleneck.getSlot());
+                        gameState.dealInitialCards();
+                        gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE +  gameState.getBottleneck().getSlot());
                     }
+                } else if (requestPlayer.getId().equals(gameState.getBottleneck().getId()) && requestPlayer.getHandScore() < 21) {
+                    PlayingCard card = gameState.dealCard();
+                    requestPlayer.addCard(card);
                 }
+
                 break;
         }
 

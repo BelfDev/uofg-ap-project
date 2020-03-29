@@ -1,3 +1,4 @@
+import javax.smartcardio.Card;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -12,7 +13,7 @@ public class GameState implements Serializable {
     private AtomicReference<Player> bottleneck;
 
     private AtomicReference<Dealer> dealer;
-    private List<PlayingCard> deck;
+    private Stack<PlayingCard> deck;
     private AtomicReference<String> feedbackText;
 
     public GameState() {
@@ -21,7 +22,7 @@ public class GameState implements Serializable {
         this.availableSlots = createSlots();
         this.dealer = new AtomicReference<>(new Dealer());
         this.bottleneck = new AtomicReference<>(null);
-        this.deck = Collections.synchronizedList(PlayingCardFactory.getPlayingCardsDeck());
+        this.deck = PlayingCardFactory.getPlayingCardsDeck();
         this.feedbackText = new AtomicReference<>("Welcome to the Black Jack game!");
     }
 
@@ -100,15 +101,18 @@ public class GameState implements Serializable {
                 .orElse(null);
     }
 
-    public synchronized void dealCards() {
-        int numberOfCards = deck.size();
+        public synchronized PlayingCard dealCard() {
+        return deck.pop();
+    }
+
+    public synchronized void dealInitialCards() {
         // Deals the initial dealer cards
         Dealer d = dealer.get();
-        d.addCard(deck.get(--numberOfCards));
+        d.addCard(deck.pop());
         // Deals two cards for each player
         for (Player player : getPlayers()) {
-            player.addCard(deck.get(--numberOfCards));
-            player.addCard(deck.get(--numberOfCards));
+            player.addCard(deck.pop());
+            player.addCard(deck.pop());
         }
     }
 
