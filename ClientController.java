@@ -145,6 +145,11 @@ class ClientController implements StateListener, ActionListener {
                 updateCards(player, playerView);
                 // Updates score label
                 playerView.setScore(player.getHandScore());
+
+                if (player.getIsEliminated()) {
+                    playerView.toggleRedLine();
+                }
+
                 // Updates the view related to the active player
                 if (player.getId().equals(activePlayer.getId())) {
                     // Updates the balance
@@ -154,6 +159,7 @@ class ClientController implements StateListener, ActionListener {
                 // Add a new player view
                 PlayerView newPlayer = view.addNewPlayer("Someone", player.getSlot());
                 updateCards(player, newPlayer);
+                if (player.getIsEliminated()) newPlayer.toggleRedLine();
             }
 
         }

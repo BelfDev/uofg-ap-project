@@ -41,6 +41,9 @@ class BlackJackProtocol implements ApplicationProtocol {
                 } else if (requestPlayer.getId().equals(gameState.getBottleneck().getId()) && requestPlayer.getHandScore() < 21) {
                     PlayingCard card = gameState.dealCard();
                     requestPlayer.addCard(card);
+                    if (requestPlayer.getHandScore() > 21) {
+                        requestPlayer.setIsEliminated(true);
+                    }
                 }
 
                 break;

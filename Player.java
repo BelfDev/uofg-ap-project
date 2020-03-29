@@ -15,6 +15,7 @@ public class Player implements Serializable {
     private AtomicInteger roundBet;
     private AtomicBoolean isBottleneck;
     private AtomicInteger handScore;
+    private AtomicBoolean isEliminated;
 
     private List<PlayingCard> cards;
 
@@ -26,6 +27,7 @@ public class Player implements Serializable {
         this.isBottleneck = new AtomicBoolean(true);
         this.handScore = new AtomicInteger(0);
         this.cards = Collections.synchronizedList(new ArrayList<>());
+        this.isEliminated = new AtomicBoolean(false);
     }
 
     public String getId() {
@@ -48,6 +50,10 @@ public class Player implements Serializable {
         return balance.get();
     }
 
+    public boolean getIsEliminated() {
+        return isEliminated.get();
+    }
+
     public List<PlayingCard> getCards() {
         return cards;
     }
@@ -66,6 +72,10 @@ public class Player implements Serializable {
 
     public void setIsBottleneck(boolean isBottleneck) {
         this.isBottleneck.set(isBottleneck);
+    }
+
+    public void setIsEliminated(boolean isEliminated) {
+        this.isEliminated.set(isEliminated);
     }
 
     public synchronized void addCard(PlayingCard card) {
