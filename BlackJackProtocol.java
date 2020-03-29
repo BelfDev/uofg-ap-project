@@ -36,16 +36,35 @@ class BlackJackProtocol implements ApplicationProtocol {
                     if (gameState.getBottlenecks().isEmpty()) {
                         gameState.advanceRound();
                         gameState.dealInitialCards();
-                        gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE +  gameState.getBottleneck().getSlot());
+                        gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + gameState.getBottleneck().getSlot());
                     }
                 } else if (requestPlayer.getId().equals(gameState.getBottleneck().getId()) && requestPlayer.getHandScore() < 21) {
+                    // Deals a card
                     PlayingCard card = gameState.dealCard();
                     requestPlayer.addCard(card);
+                    // Evaluates new card score
                     if (requestPlayer.getHandScore() > 21) {
+                        // Request player lost on this turn
+                        // Updates the request player state
                         requestPlayer.setIsEliminated(true);
+                        requestPlayer.setIsBottleneck(false);
+                        requestPlayer.resetRoundBet();
+                        // Updates the overall game state
+                        Player nextBottleneck = gameState.getNextBottleneck();
+                        gameState.setBottleneck(nextBottleneck);
+                        gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + nextBottleneck.getSlot());
+                    } else if (requestPlayer.getHandScore() == 21) {
+                        // Updates the winner player
+                        requestPlayer.setIsWinner(true);
+                        // Calculates the player reward
+                        int simpleReward = requestPlayer.getRoundBet() * 2;
+                        // Increases the player balance
+                        requestPlayer.setBalance(simpleReward);
+                        // Advances to a new round
+                        // TODO: Adjust new round when player wins
+                        // gameState.advanceRound();
                     }
                 }
-
                 break;
         }
 

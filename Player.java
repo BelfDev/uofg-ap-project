@@ -16,6 +16,9 @@ public class Player implements Serializable {
     private AtomicBoolean isBottleneck;
     private AtomicInteger handScore;
     private AtomicBoolean isEliminated;
+    private AtomicBoolean isWinner;
+
+    private AtomicInteger numberOfElevenAces;
 
     private List<PlayingCard> cards;
 
@@ -28,6 +31,8 @@ public class Player implements Serializable {
         this.handScore = new AtomicInteger(0);
         this.cards = Collections.synchronizedList(new ArrayList<>());
         this.isEliminated = new AtomicBoolean(false);
+        this.isWinner = new AtomicBoolean(false);
+        this.numberOfElevenAces = new AtomicInteger(0);
     }
 
     public String getId() {
@@ -50,8 +55,12 @@ public class Player implements Serializable {
         return balance.get();
     }
 
-    public boolean getIsEliminated() {
+    public boolean isEliminated() {
         return isEliminated.get();
+    }
+
+    public boolean getIsWinner() {
+        return isWinner.get();
     }
 
     public List<PlayingCard> getCards() {
@@ -70,12 +79,20 @@ public class Player implements Serializable {
         this.roundBet.getAndAdd(value);
     }
 
+    public void resetRoundBet() {
+        this.roundBet.set(0);
+    }
+
     public void setIsBottleneck(boolean isBottleneck) {
         this.isBottleneck.set(isBottleneck);
     }
 
     public void setIsEliminated(boolean isEliminated) {
         this.isEliminated.set(isEliminated);
+    }
+
+    public void setIsWinner(boolean isWinner) {
+        this.isWinner.set(isWinner);
     }
 
     public synchronized void addCard(PlayingCard card) {
@@ -96,14 +113,28 @@ public class Player implements Serializable {
                 score = 1;
             } else {
                 score = 11;
+                numberOfElevenAces.getAndIncrement();
             }
         } else if (card.getValue().equals("j") || card.getValue().equals("q") || card.getValue().equals("k")) {
             score = 10;
         } else {
             score = Integer.parseInt(card.getValue());
         }
+
+        // Corrects the value of Aces if necessary
+        return correctAceValueIfNeeded(score);
+    }
+
+    private int correctAceValueIfNeeded(int score) {
+        for (int i = 0; i < numberOfElevenAces.get(); i++) {
+            if (score - 10 <= 21) {
+                numberOfElevenAces.getAndDecrement();
+                return score;
+            }
+        }
         return score;
     }
+
 
     @Override
     public String toString() {

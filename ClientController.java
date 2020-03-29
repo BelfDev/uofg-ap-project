@@ -129,7 +129,10 @@ class ClientController implements StateListener, ActionListener {
 
     private void requestCard() {
         // TODO: Create hit request
-        requestSender.sendRequest(new ClientRequest.Builder(Command.HIT, activePlayer.getId()).build());
+        if (!activePlayer.isEliminated()) {
+            requestSender.sendRequest(new ClientRequest.Builder(Command.HIT, activePlayer.getId()).build());
+        }
+
     }
 
     private void updatePlayerViews() {
@@ -146,7 +149,7 @@ class ClientController implements StateListener, ActionListener {
                 // Updates score label
                 playerView.setScore(player.getHandScore());
 
-                if (player.getIsEliminated()) {
+                if (player.isEliminated()) {
                     playerView.toggleRedLine();
                 }
 
@@ -159,7 +162,7 @@ class ClientController implements StateListener, ActionListener {
                 // Add a new player view
                 PlayerView newPlayer = view.addNewPlayer("Someone", player.getSlot());
                 updateCards(player, newPlayer);
-                if (player.getIsEliminated()) newPlayer.toggleRedLine();
+                if (player.isEliminated()) newPlayer.toggleRedLine();
             }
 
         }
