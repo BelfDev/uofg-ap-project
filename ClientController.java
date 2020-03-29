@@ -14,11 +14,14 @@ class ClientController implements StateListener, ActionListener {
     private Player activePlayer;
     private List<Player> playerList;
 
+    private RoundPhase roundPhase;
+
     public ClientController(ClientView view, RequestSender requestSender) {
         this.view = view;
         this.requestSender = requestSender;
         this.activePlayer = null;
         this.playerList = null;
+        this.roundPhase = null;
         view.setActionListener(this);
         view.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -32,6 +35,8 @@ class ClientController implements StateListener, ActionListener {
     public void onReceiveState(GameState state) {
         System.out.println("RECEIVED NEW STATE");
         System.out.println(state);
+        // Updates the round phase
+        roundPhase = state.getRoundPhase();
         // Stores previous player state
         List<Player> previousPlayerState = playerList;
         // Updates the player state
@@ -43,18 +48,17 @@ class ClientController implements StateListener, ActionListener {
         // Remove players who quit the game
         removeQuitPlayers(previousPlayerState);
         // Update the dealer
-        updateDealerView(state.getDealer(), state.getRoundPhase());
+        updateDealerView(state.getDealer());
         // Updates the players views
         updatePlayerViews();
         // Update feedback
         view.setFeedback(state.getFeedbackText());
-
     }
 
-    private void updateDealerView(Dealer dealer, RoundPhase phase) {
+    private void updateDealerView(Dealer dealer) {
         DealerView dealerView = view.getDealerView();
         updateCards(dealer, dealerView);
-        if (phase == RoundPhase.CARD_DEAL) {
+        if (roundPhase == RoundPhase.CARD_DEAL) {
             dealerView.addCard(new CardView("assets/card_cover"));
         }
         dealerView.setScore(dealer.getHandScore());
@@ -85,9 +89,11 @@ class ClientController implements StateListener, ActionListener {
                 view.dispatchEvent(new WindowEvent(view, WindowEvent.WINDOW_CLOSING));
                 break;
             case BET:
-                JButton chipButton = (JButton) e.getSource();
-                int value = Integer.parseInt(chipButton.getName());
-                placeBet(value);
+                if (roundPhase == RoundPhase.INITIAL_BET) {
+                    JButton chipButton = (JButton) e.getSource();
+                    int value = Integer.parseInt(chipButton.getName());
+                    placeBet(value);
+                }
                 break;
             case HIT:
                 requestCard();
