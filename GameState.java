@@ -5,6 +5,9 @@ import java.util.stream.Collectors;
 
 public class GameState implements Serializable {
 
+    private static final String AWAITING_FOR_BETS = "Please place your bets.";
+    private static final String AWAITING_FOR_DEALER = "And the dealer reveal his cards!";
+
     private AtomicReference<RoundPhase> roundPhase;
     // Indicates the game bottleneck (i.e. which player everyone is waiting for)
     private Map<String, Player> playerMap;
@@ -89,21 +92,21 @@ public class GameState implements Serializable {
         RoundPhase nextRoundPhase;
         nextRoundPhase = getNextRoundPhase();
         roundPhase.set(nextRoundPhase);
-        playerMap.values().forEach(p -> {
+        if (nextRoundPhase != RoundPhase.DEALER_REVEAL) {
+            playerMap.values().forEach(p -> {
                     p.setIsBottleneck(true);
+                    p.removeAllCards();
                     p.setIsEliminated(false);
                     p.setIsWinner(false);
-                    if (nextRoundPhase == RoundPhase.INITIAL_BET) {
-                        p.removeAllCards();
-                    }
-                }
-        );
+            });
+        }
         this.bottleneck.set(getNextBottleneck());
+        updateNewRoundFeedback();
     }
 
     private RoundPhase getNextRoundPhase() {
         RoundPhase nextRoundPhase;
-        if (roundPhase.get() == RoundPhase.PLAYER_ACTION) {
+        if (roundPhase.get() == RoundPhase.DEALER_REVEAL) {
             nextRoundPhase = RoundPhase.INITIAL_BET;
         } else {
             int currentOrder = roundPhase.get().getOrder();
@@ -134,6 +137,12 @@ public class GameState implements Serializable {
         }
     }
 
+    public synchronized List<Player> getEliminatedPlayers() {
+        return playerMap.values().stream()
+                .filter(Player::isEliminated)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     private Stack<Integer> createSlots() {
         // Creates a stack with available slot numbers that will be consulted when positioning players
         Stack<Integer> availableSlots = new Stack<>();
@@ -141,6 +150,17 @@ public class GameState implements Serializable {
             availableSlots.add(i);
         }
         return availableSlots;
+    }
+
+    private void updateNewRoundFeedback() {
+        switch (roundPhase.get()) {
+            case INITIAL_BET:
+                setFeedbackText(AWAITING_FOR_BETS);
+                break;
+            case DEALER_REVEAL:
+                setFeedbackText(AWAITING_FOR_DEALER);
+                break;
+        }
     }
 
     @Override

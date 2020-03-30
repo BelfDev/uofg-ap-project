@@ -16,6 +16,7 @@ public class DealerView extends JPanel implements CardReceiver {
     private JPanel rightBorder;
     private List<CardView> cards;
 
+
     /**
      * Creates a DealerView that displays the Dealer's cards and score.
      */
@@ -59,7 +60,7 @@ public class DealerView extends JPanel implements CardReceiver {
         this.cardsContainer.removeAll();
         this.cardsContainer = createCardsContainer();
         this.cards = new ArrayList<>();
-        this.add(cardsContainer);
+        this.add(cardsContainer, 0);
         revalidate();
         repaint();
     }

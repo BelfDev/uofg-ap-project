@@ -57,6 +57,9 @@ class ClientController implements StateListener, ActionListener {
 
     private void updateDealerView(Dealer dealer) {
         DealerView dealerView = view.getDealerView();
+        if (roundPhase == RoundPhase.DEALER_REVEAL) {
+            dealerView.removeCards();
+        }
         updateCards(dealer, dealerView);
         if (roundPhase == RoundPhase.PLAYER_ACTION && dealerView.getNumberOfCards() == 1) {
             dealerView.addCard(new CardView("assets/card_cover"));
@@ -149,7 +152,9 @@ class ClientController implements StateListener, ActionListener {
                 // Updates score label
                 playerView.setScore(player.getHandScore());
                 // Displays a red line in case the player is eliminated
-                if (player.isEliminated()) { playerView.toggleRedLine(); }
+                if (player.isEliminated()) {
+                    playerView.toggleRedLine();
+                }
                 // Updates the view related to the active player
                 if (player.getId().equals(activePlayer.getId())) {
                     // Updates the balance

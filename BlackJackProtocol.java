@@ -1,7 +1,6 @@
 class BlackJackProtocol implements ApplicationProtocol {
 
     private static final String AWAITING_PLAYER_MESSAGE = "Awaiting for player in slot ";
-    private static final String AWAITING_FOR_BETS = "Please place your bets! ";
 
     private GameState gameState;
 
@@ -12,7 +11,7 @@ class BlackJackProtocol implements ApplicationProtocol {
     @Override
     public synchronized ServerResponse processInput(ClientRequest request) {
         Player requestPlayer = gameState.getPlayer(request.getPlayerId());
-        RoundPhase phase = gameState.getRoundPhase();
+        RoundPhase requestRoundPhase = gameState.getRoundPhase();
 
         switch (request.getCommand()) {
             case JOIN:
@@ -21,7 +20,7 @@ class BlackJackProtocol implements ApplicationProtocol {
             case QUIT:
                 gameState.removePlayer(request.getPlayerId());
                 System.out.println(String.format("Player %s has left the game", request.getPlayerId()));
-                if (phase.equals(RoundPhase.PLAYER_ACTION)) {
+                if (requestRoundPhase.equals(RoundPhase.PLAYER_ACTION)) {
                     Player bottleneck = gameState.getBottleneck();
                     gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + bottleneck.getSlot());
                 }
@@ -32,7 +31,7 @@ class BlackJackProtocol implements ApplicationProtocol {
                 requestPlayer.setBalance(requestPlayer.getBalance() - newBet);
                 break;
             case HIT:
-                if (phase.equals(RoundPhase.INITIAL_BET)) {
+                if (requestRoundPhase.equals(RoundPhase.INITIAL_BET)) {
                     requestPlayer.setIsBottleneck(false);
                     if (gameState.getBottlenecks().isEmpty()) {
                         gameState.advanceRound();
@@ -52,12 +51,13 @@ class BlackJackProtocol implements ApplicationProtocol {
                         requestPlayer.resetRoundBet();
                         // Updates the overall game state
                         Player nextBottleneck = gameState.getNextBottleneck();
+                        // If there are any bottlenecks
                         if (nextBottleneck != null) {
                             gameState.setBottleneck(nextBottleneck);
                             gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + nextBottleneck.getSlot());
                         } else {
+                            // If there are no more bottlenecks
                             gameState.advanceRound();
-                            gameState.setFeedbackText(AWAITING_FOR_BETS);
                         }
                     } else if (requestPlayer.getHandScore() == 21) {
                         // Updates the winner player
@@ -68,8 +68,22 @@ class BlackJackProtocol implements ApplicationProtocol {
                         requestPlayer.setBalance(simpleReward);
                         // Advances to a new round
                         gameState.advanceRound();
-                        gameState.setFeedbackText(AWAITING_FOR_BETS);
                     }
+
+                    if (gameState.getEliminatedPlayers().size() == Configs.MAX_NUMBER_OF_PLAYERS) {
+                        gameState.advanceRound();
+                    }
+
+                    // Updates dealer in DEALER REVEAL phase
+                    if (gameState.getRoundPhase().equals(RoundPhase.DEALER_REVEAL)) {
+                        Dealer dealer = gameState.getDealer();
+                        // Draws cards until totals 17
+                        while (dealer.getHandScore() < 17) {
+                            PlayingCard dealerCard = gameState.dealCard();
+                            dealer.addCard(dealerCard);
+                        }
+                    }
+
                 }
                 break;
         }
