@@ -43,12 +43,15 @@ class ClientController implements StateListener, ActionListener {
         playerList = state.getPlayers();
         // Initializes this client's player view
         initActivePlayerIfNeeded();
+        // Updates current player reference
+        activePlayer = state.getPlayer(activePlayer.getId());
         // Updates the number of players
         updateNumberOfPlayersIfNeeded(previousPlayerState, state.getNumberOfPlayers());
         // Removes players who quit the game
         removeQuitPlayers(previousPlayerState);
         // Updates the dealer
         updateDealerView(state.getDealer());
+        System.out.println("\n\n" + state.getDealer().getHandScore() + "\n\n");
         // Updates the players views
         updatePlayerViews();
         // Update feedback
@@ -56,11 +59,15 @@ class ClientController implements StateListener, ActionListener {
     }
 
     private void updateFeedback(String serverFeedback) {
+        String feedback = serverFeedback;
         if (roundPhase.equals(RoundPhase.DEALER_REVEAL)) {
-            view.setFeedback(activePlayer.isWinner() ? ("You win! " + activePlayer.getRoundBet()) : "And the Dealer takes it all!");
-        } else {
-            view.setFeedback(serverFeedback);
+            if (activePlayer.isPush()) {
+                feedback = "It's a draw! You don't lose anything.";
+            } else {
+                feedback = activePlayer.isWinner() ? "You win! " : "And the Dealer takes it all!";
+            }
         }
+        view.setFeedback(feedback);
     }
 
     private void updateNumberOfPlayersIfNeeded(List<Player> previousPlayerList, int currentNumberOfPlayers) {

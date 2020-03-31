@@ -21,7 +21,7 @@ class BlackJackProtocol implements ApplicationProtocol {
                 gameState.removePlayer(request.getPlayerId());
                 System.out.println(String.format("Player %s has left the game", request.getPlayerId()));
                 if (requestRoundPhase.equals(RoundPhase.PLAYER_ACTION)) {
-                    Player bottleneck = gameState.getBottleneck();
+                    Player bottleneck = gameState.getNextBottleneck();
                     gameState.setFeedbackText(GameState.AWAITING_PLAYER_MESSAGE + bottleneck.getSlot());
                 }
                 break;
@@ -39,7 +39,7 @@ class BlackJackProtocol implements ApplicationProtocol {
 //                        gameState.dealInitialCards();
 //                        gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + gameState.getBottleneck().getSlot());
 //                    }
-                } else if (requestPlayer.getId().equals(gameState.getBottleneck().getId()) && requestPlayer.getHandScore() < 21) {
+                } else if (requestPlayer.isBottleneck() && requestPlayer.getHandScore() < 21) {
                     // Deals a card
                     PlayingCard card = gameState.dealCard();
                     requestPlayer.addCard(card);
@@ -65,9 +65,8 @@ class BlackJackProtocol implements ApplicationProtocol {
                     if (gameState.getEliminatedPlayers().size() == Configs.MAX_NUMBER_OF_PLAYERS) {
                         gameState.advanceRound();
                     }
-                    updateDealerIfNeeded();
-
                 }
+                updateDealerIfNeeded();
                 break;
             case STAND:
                 passTurn(requestPlayer.getId(), requestRoundPhase);
@@ -113,10 +112,16 @@ class BlackJackProtocol implements ApplicationProtocol {
             gameState.setFeedbackText("The dealer has a Black Jack!");
         } else {
             // TODO: Set game state feedback
+            System.out.println("\n\n DEALER SCORE:");
+            System.out.println(dealerScore);
+
             players.forEach(player -> {
                 // Checks if ongoing players have won
                 int playerScore = player.getHandScore();
                 double previousBalance = player.getBalance();
+                System.out.println("\n\n PLAYER SCORE:");
+                System.out.println(playerScore);
+
                 if (playerScore > dealerScore && dealerScore < 21) {
                     // Sets the player as a winner
                     player.setIsWinner(true);
@@ -125,9 +130,24 @@ class BlackJackProtocol implements ApplicationProtocol {
                     double roundBet = player.getRoundBet();
                     // If player has a black jack, he gets paid 3 to 2.
                     // Otherwise, he gets paid 2 to 1.
-                    double reward = numberOfCards == 2 ? roundBet * 2 : roundBet;
-                    player.setBalance(previousBalance + reward);
+                    double reward = numberOfCards == 2 ? roundBet * 1.5 : roundBet;
+                    player.setBalance(previousBalance + roundBet + reward);
+                } else if (playerScore == dealerScore && dealerScore <= 21) {
+                    // This is a draw (push)
+                    player.setIsPush(true);
+                    player.setBalance(previousBalance + player.getRoundBet());
+                } else {
+                    // The dealer busted
+                    player.setIsWinner(true);
+                    player.setBalance(previousBalance + player.getRoundBet() * 2);
                 }
+
+                System.out.println("\n\n PLAYER STATUS:");
+                System.out.println("\n WIN?");
+                System.out.println(player.isWinner());
+                System.out.println("\n DRAW?");
+                System.out.println(player.isPush());
+
                 // Resets the round bet
                 player.resetRoundBet();
             });

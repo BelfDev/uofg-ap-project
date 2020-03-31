@@ -104,6 +104,7 @@ public class GameState implements Serializable {
                 p.removeAllCards();
                 p.setIsEliminated(false);
                 p.setIsWinner(false);
+                p.setIsPush(false);
             });
         }
         this.bottleneck.set(getNextBottleneck());

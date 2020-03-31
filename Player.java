@@ -17,6 +17,7 @@ public class Player implements Serializable {
     private AtomicInteger handScore;
     private AtomicBoolean isEliminated;
     private AtomicBoolean isWinner;
+    private AtomicBoolean isPush;
 
     private AtomicInteger numberOfElevenAces;
 
@@ -32,6 +33,7 @@ public class Player implements Serializable {
         this.cards = Collections.synchronizedList(new ArrayList<>());
         this.isEliminated = new AtomicBoolean(false);
         this.numberOfElevenAces = new AtomicInteger(0);
+        this.isPush = new AtomicBoolean(false);
         this.isWinner = new AtomicBoolean(false);
     }
 
@@ -45,6 +47,10 @@ public class Player implements Serializable {
 
     public boolean isWinner() {
         return isWinner.get();
+    }
+
+    public boolean isPush() {
+        return isPush.get();
     }
 
     public int getRoundBet() {
@@ -89,6 +95,10 @@ public class Player implements Serializable {
 
     public void setIsEliminated(boolean isEliminated) {
         this.isEliminated.set(isEliminated);
+    }
+
+    public void setIsPush(boolean isPush) {
+        this.isPush.set(isPush);
     }
 
     public void setIsWinner(boolean isWinner) {
