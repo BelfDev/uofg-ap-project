@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 class BlackJackProtocol implements ApplicationProtocol {
 
     private static final String AWAITING_PLAYER_MESSAGE = "Awaiting for player in slot ";
@@ -59,15 +62,6 @@ class BlackJackProtocol implements ApplicationProtocol {
                             // If there are no more bottlenecks
                             gameState.advanceRound();
                         }
-                    } else if (requestPlayer.getHandScore() == 21) {
-                        // Updates the winner player
-                        requestPlayer.setIsWinner(true);
-                        // Calculates the player reward
-                        int simpleReward = requestPlayer.getRoundBet() * 2;
-                        // Increases the player balance
-                        requestPlayer.setBalance(simpleReward);
-                        // Advances to a new round
-                        gameState.advanceRound();
                     }
 
                     if (gameState.getEliminatedPlayers().size() == Configs.MAX_NUMBER_OF_PLAYERS) {
@@ -82,6 +76,7 @@ class BlackJackProtocol implements ApplicationProtocol {
                             PlayingCard dealerCard = gameState.dealCard();
                             dealer.addCard(dealerCard);
                         }
+                        processRoundOutcome();
                     }
                 }
                 break;
@@ -90,5 +85,32 @@ class BlackJackProtocol implements ApplicationProtocol {
         return new ServerResponse(ResponseStatus.OK, gameState);
     }
 
+    private void processRoundOutcome() {
+        List<Player> players = gameState.getOngoingPlayers();
+        Dealer dealer = gameState.getDealer();
+        int dealerScore = dealer.getHandScore();
+        // Checks if the dealer has a black jack
+        if (dealerScore == 21 && dealer.getCards().size() == 2) {
+            gameState.setFeedbackText("The dealer has a Black Jack!");
+        } else {
+            // TODO: Set game state feedback
+            players.forEach(player -> {
+                // Checks if ongoing players have won
+                int playerScore = player.getHandScore();
+                double previousBalance = player.getBalance();
+                if (playerScore > dealerScore) {
+                    // Calculates the reward
+                    int numberOfCards = player.getCards().size();
+                    double roundBet = player.getRoundBet();
+                    // If player has a black jack, he gets paid 3 to 2.
+                    // Otherwise, he gets paid 2 to 1.
+                    double reward = numberOfCards == 2 ? roundBet * 2 : roundBet;
+                    player.setBalance(previousBalance + reward);
+                }
+                // Resets the round bet
+                player.resetRoundBet();
+            });
+        }
+    }
 
 }

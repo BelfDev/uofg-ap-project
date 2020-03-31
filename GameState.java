@@ -63,6 +63,12 @@ public class GameState implements Serializable {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
+    public synchronized List<Player> getOngoingPlayers() {
+        return playerMap.values().stream()
+                .filter(p -> !p.isEliminated())
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     public String getFeedbackText() {
         return feedbackText.get();
     }
@@ -97,7 +103,6 @@ public class GameState implements Serializable {
                     p.setIsBottleneck(true);
                     p.removeAllCards();
                     p.setIsEliminated(false);
-                    p.setIsWinner(false);
             });
         }
         this.bottleneck.set(getNextBottleneck());

@@ -11,12 +11,11 @@ public class Player implements Serializable {
     private final AtomicReference<String> id;
     private final AtomicInteger slot;
 
-    private AtomicInteger balance;
+    private AtomicReference<Double> balance;
     private AtomicInteger roundBet;
     private AtomicBoolean isBottleneck;
     private AtomicInteger handScore;
     private AtomicBoolean isEliminated;
-    private AtomicBoolean isWinner;
 
     private AtomicInteger numberOfElevenAces;
 
@@ -25,13 +24,12 @@ public class Player implements Serializable {
     public Player(String id, Integer slot) {
         this.id = new AtomicReference<>(id);
         this.slot = new AtomicInteger(slot);
-        this.balance = new AtomicInteger(Configs.PLAYER_INITIAL_BALANCE);
+        this.balance = new AtomicReference<Double>(Configs.PLAYER_INITIAL_BALANCE);
         this.roundBet = new AtomicInteger(0);
         this.isBottleneck = new AtomicBoolean(true);
         this.handScore = new AtomicInteger(0);
         this.cards = Collections.synchronizedList(new ArrayList<>());
         this.isEliminated = new AtomicBoolean(false);
-        this.isWinner = new AtomicBoolean(false);
         this.numberOfElevenAces = new AtomicInteger(0);
     }
 
@@ -51,7 +49,7 @@ public class Player implements Serializable {
         return handScore.get();
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance.get();
     }
 
@@ -59,15 +57,11 @@ public class Player implements Serializable {
         return isEliminated.get();
     }
 
-    public boolean getIsWinner() {
-        return isWinner.get();
-    }
-
     public List<PlayingCard> getCards() {
         return cards;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(double balance) {
         this.balance.set(balance);
     }
 
@@ -89,10 +83,6 @@ public class Player implements Serializable {
 
     public void setIsEliminated(boolean isEliminated) {
         this.isEliminated.set(isEliminated);
-    }
-
-    public void setIsWinner(boolean isWinner) {
-        this.isWinner.set(isWinner);
     }
 
     public synchronized void addCard(PlayingCard card) {

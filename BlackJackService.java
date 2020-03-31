@@ -13,7 +13,7 @@ import java.util.Observable;
  */
 class BlackJackService extends Observable implements Runnable {
 
-    private static final int RESTART_ROUND_DELAY = 5000;
+    private static final int RESTART_ROUND_DELAY = 3000;
 
     private final GameState gameState;
     private final Socket clientSocket;

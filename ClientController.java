@@ -96,7 +96,7 @@ class ClientController implements StateListener, ActionListener {
 
     private void placeBet(int value) {
         int newRoundBet = activePlayer.getRoundBet() + value;
-        int balance = activePlayer.getBalance();
+        double balance = activePlayer.getBalance();
         if (newRoundBet <= balance) {
             activePlayer.increaseRoundBet(value);
             requestSender.sendRequest(new ClientRequest.Builder(Command.BET, activePlayer.getId())
