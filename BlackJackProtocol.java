@@ -83,7 +83,6 @@ class BlackJackProtocol implements ApplicationProtocol {
                             dealer.addCard(dealerCard);
                         }
                     }
-
                 }
                 break;
         }

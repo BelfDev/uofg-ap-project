@@ -104,6 +104,10 @@ public class GameState implements Serializable {
         updateNewRoundFeedback();
     }
 
+    public synchronized void resetDealer() {
+        this.dealer = new AtomicReference<>(new Dealer());
+    }
+
     private RoundPhase getNextRoundPhase() {
         RoundPhase nextRoundPhase;
         if (roundPhase.get() == RoundPhase.DEALER_REVEAL) {

@@ -1,3 +1,5 @@
+import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -10,6 +12,8 @@ import java.util.Observable;
  * outputs of the relevant game state based on the BlackJack protocol.
  */
 class BlackJackService extends Observable implements Runnable {
+
+    private static final int RESTART_ROUND_DELAY = 5000;
 
     private final GameState gameState;
     private final Socket clientSocket;
@@ -59,6 +63,7 @@ class BlackJackService extends Observable implements Runnable {
                 }
                 // Notifies the generated response to observers
                 notifyResponse(response);
+                endRoundIfNeeded();
             }
         } catch (EOFException ex1) {
             System.out.println("Service terminated");
@@ -75,6 +80,20 @@ class BlackJackService extends Observable implements Runnable {
             }
         }
 
+    }
+
+    private void endRoundIfNeeded() {
+        if (gameState.getRoundPhase().equals(RoundPhase.DEALER_REVEAL)) {
+            // Notifies the server after
+            ActionListener taskPerformer = evt -> {
+                gameState.advanceRound();
+                gameState.resetDealer();
+                notifyResponse(new ServerResponse(ResponseStatus.OK, gameState));
+            };
+            Timer timer = new Timer(RESTART_ROUND_DELAY, taskPerformer);
+            timer.setRepeats(false);
+            timer.start();
+        }
     }
 
     private void notifyResponse(ServerResponse response) {

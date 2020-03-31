@@ -55,18 +55,6 @@ class ClientController implements StateListener, ActionListener {
         view.setFeedback(state.getFeedbackText());
     }
 
-    private void updateDealerView(Dealer dealer) {
-        DealerView dealerView = view.getDealerView();
-        if (roundPhase == RoundPhase.DEALER_REVEAL) {
-            dealerView.removeCards();
-        }
-        updateCards(dealer, dealerView);
-        if (roundPhase == RoundPhase.PLAYER_ACTION && dealerView.getNumberOfCards() == 1) {
-            dealerView.addCard(new CardView("assets/card_cover"));
-        }
-        dealerView.setScore(dealer.getHandScore());
-    }
-
     private void updateNumberOfPlayersIfNeeded(List<Player> previousPlayerList, int currentNumberOfPlayers) {
         if (previousPlayerList == null || previousPlayerList.size() != currentNumberOfPlayers) {
             String numberOfPlayersText = String.valueOf(currentNumberOfPlayers);
@@ -169,6 +157,18 @@ class ClientController implements StateListener, ActionListener {
 
         }
 
+    }
+
+    private void updateDealerView(Dealer dealer) {
+        DealerView dealerView = view.getDealerView();
+        if (roundPhase == RoundPhase.DEALER_REVEAL) {
+            dealerView.removeCards();
+        }
+        updateCards(dealer, dealerView);
+        if (roundPhase == RoundPhase.PLAYER_ACTION && dealerView.getNumberOfCards() == 1) {
+            dealerView.addCard(new CardView("assets/card_cover"));
+        }
+        dealerView.setScore(dealer.getHandScore());
     }
 
     private void updateCards(Player player, CardReceiver receiver) {

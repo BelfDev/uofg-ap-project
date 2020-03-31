@@ -1,3 +1,3 @@
 public enum Command {
-    JOIN, QUIT, BET, HIT
+    JOIN, QUIT, BET, HIT;
 }
