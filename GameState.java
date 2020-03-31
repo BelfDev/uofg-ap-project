@@ -5,8 +5,8 @@ import java.util.stream.Collectors;
 
 public class GameState implements Serializable {
 
+    public static final String AWAITING_PLAYER_MESSAGE = "Awaiting for player in slot ";
     private static final String AWAITING_FOR_BETS = "Please place your bets.";
-    private static final String AWAITING_FOR_DEALER = "And the dealer reveal his cards!";
 
     private AtomicReference<RoundPhase> roundPhase;
     // Indicates the game bottleneck (i.e. which player everyone is waiting for)
@@ -100,9 +100,10 @@ public class GameState implements Serializable {
         roundPhase.set(nextRoundPhase);
         if (nextRoundPhase != RoundPhase.DEALER_REVEAL) {
             playerMap.values().forEach(p -> {
-                    p.setIsBottleneck(true);
-                    p.removeAllCards();
-                    p.setIsEliminated(false);
+                p.setIsBottleneck(true);
+                p.removeAllCards();
+                p.setIsEliminated(false);
+                p.setIsWinner(false);
             });
         }
         this.bottleneck.set(getNextBottleneck());
@@ -166,9 +167,8 @@ public class GameState implements Serializable {
             case INITIAL_BET:
                 setFeedbackText(AWAITING_FOR_BETS);
                 break;
-            case DEALER_REVEAL:
-                setFeedbackText(AWAITING_FOR_DEALER);
-                break;
+            case PLAYER_ACTION:
+                setFeedbackText(AWAITING_PLAYER_MESSAGE + bottleneck.get().getSlot());
         }
     }
 

@@ -16,6 +16,7 @@ public class Player implements Serializable {
     private AtomicBoolean isBottleneck;
     private AtomicInteger handScore;
     private AtomicBoolean isEliminated;
+    private AtomicBoolean isWinner;
 
     private AtomicInteger numberOfElevenAces;
 
@@ -31,6 +32,7 @@ public class Player implements Serializable {
         this.cards = Collections.synchronizedList(new ArrayList<>());
         this.isEliminated = new AtomicBoolean(false);
         this.numberOfElevenAces = new AtomicInteger(0);
+        this.isWinner = new AtomicBoolean(false);
     }
 
     public String getId() {
@@ -39,6 +41,10 @@ public class Player implements Serializable {
 
     public int getSlot() {
         return slot.get();
+    }
+
+    public boolean isWinner() {
+        return isWinner.get();
     }
 
     public int getRoundBet() {
@@ -85,6 +91,10 @@ public class Player implements Serializable {
         this.isEliminated.set(isEliminated);
     }
 
+    public void setIsWinner(boolean isWinner) {
+        this.isWinner.set(isWinner);
+    }
+
     public synchronized void addCard(PlayingCard card) {
         int score = calculateScore(card);
         this.handScore.getAndAdd(score);
@@ -99,7 +109,7 @@ public class Player implements Serializable {
     private int calculateScore(PlayingCard card) {
         int score = this.handScore.get();
         if (card.getValue().equals("a")) {
-            if (((score + 10) > 21)) {
+            if (((score + 10) > 21) || numberOfElevenAces.get() == 1) {
                 score = 1;
             } else {
                 score = 11;
@@ -116,10 +126,12 @@ public class Player implements Serializable {
     }
 
     private int correctAceValueIfNeeded(int score) {
-        for (int i = 0; i < numberOfElevenAces.get(); i++) {
-            if (score - 10 <= 21) {
-                numberOfElevenAces.getAndDecrement();
-                return score;
+        if (this.cards.size() > 0) {
+            for (int i = 0; i < numberOfElevenAces.get(); i++) {
+                if (score - 10 <= 21) {
+                    numberOfElevenAces.getAndDecrement();
+                    return score;
+                }
             }
         }
         return score;

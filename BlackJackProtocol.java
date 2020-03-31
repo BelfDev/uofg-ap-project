@@ -1,9 +1,6 @@
-import java.util.ArrayList;
 import java.util.List;
 
 class BlackJackProtocol implements ApplicationProtocol {
-
-    private static final String AWAITING_PLAYER_MESSAGE = "Awaiting for player in slot ";
 
     private GameState gameState;
 
@@ -25,7 +22,7 @@ class BlackJackProtocol implements ApplicationProtocol {
                 System.out.println(String.format("Player %s has left the game", request.getPlayerId()));
                 if (requestRoundPhase.equals(RoundPhase.PLAYER_ACTION)) {
                     Player bottleneck = gameState.getBottleneck();
-                    gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + bottleneck.getSlot());
+                    gameState.setFeedbackText(GameState.AWAITING_PLAYER_MESSAGE + bottleneck.getSlot());
                 }
                 break;
             case BET:
@@ -35,12 +32,13 @@ class BlackJackProtocol implements ApplicationProtocol {
                 break;
             case HIT:
                 if (requestRoundPhase.equals(RoundPhase.INITIAL_BET)) {
-                    requestPlayer.setIsBottleneck(false);
-                    if (gameState.getBottlenecks().isEmpty()) {
-                        gameState.advanceRound();
-                        gameState.dealInitialCards();
-                        gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + gameState.getBottleneck().getSlot());
-                    }
+                    passTurn(requestPlayer.getId(), requestRoundPhase);
+//                    requestPlayer.setIsBottleneck(false);
+//                    if (gameState.getBottlenecks().isEmpty()) {
+//                        gameState.advanceRound();
+//                        gameState.dealInitialCards();
+//                        gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + gameState.getBottleneck().getSlot());
+//                    }
                 } else if (requestPlayer.getId().equals(gameState.getBottleneck().getId()) && requestPlayer.getHandScore() < 21) {
                     // Deals a card
                     PlayingCard card = gameState.dealCard();
@@ -57,7 +55,7 @@ class BlackJackProtocol implements ApplicationProtocol {
                         // If there are any bottlenecks
                         if (nextBottleneck != null) {
                             gameState.setBottleneck(nextBottleneck);
-                            gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + nextBottleneck.getSlot());
+                            gameState.setFeedbackText(GameState.AWAITING_PLAYER_MESSAGE + nextBottleneck.getSlot());
                         } else {
                             // If there are no more bottlenecks
                             gameState.advanceRound();
@@ -67,22 +65,43 @@ class BlackJackProtocol implements ApplicationProtocol {
                     if (gameState.getEliminatedPlayers().size() == Configs.MAX_NUMBER_OF_PLAYERS) {
                         gameState.advanceRound();
                     }
+                    updateDealerIfNeeded();
 
-                    // Updates dealer in DEALER REVEAL phase
-                    if (gameState.getRoundPhase().equals(RoundPhase.DEALER_REVEAL)) {
-                        Dealer dealer = gameState.getDealer();
-                        // Draws cards until totals 17
-                        while (dealer.getHandScore() < 17) {
-                            PlayingCard dealerCard = gameState.dealCard();
-                            dealer.addCard(dealerCard);
-                        }
-                        processRoundOutcome();
-                    }
                 }
+                break;
+            case STAND:
+                passTurn(requestPlayer.getId(), requestRoundPhase);
+                updateDealerIfNeeded();
                 break;
         }
 
         return new ServerResponse(ResponseStatus.OK, gameState);
+    }
+
+    private void passTurn(String requestPlayerId, RoundPhase requestRoundPhase) {
+        Player requestPlayer = gameState.getPlayer(requestPlayerId);
+        requestPlayer.setIsBottleneck(false);
+        if (gameState.getBottlenecks().isEmpty()) {
+            gameState.advanceRound();
+            if (requestRoundPhase.equals(RoundPhase.INITIAL_BET)) {
+                gameState.dealInitialCards();
+            }
+        } else if (requestRoundPhase.equals(RoundPhase.PLAYER_ACTION)) {
+            gameState.setFeedbackText(GameState.AWAITING_PLAYER_MESSAGE + gameState.getNextBottleneck().getSlot());
+        }
+    }
+
+    private void updateDealerIfNeeded() {
+        // Updates dealer in DEALER REVEAL phase
+        if (gameState.getRoundPhase().equals(RoundPhase.DEALER_REVEAL)) {
+            Dealer dealer = gameState.getDealer();
+            // Draws cards until totals 17
+            while (dealer.getHandScore() < 17) {
+                PlayingCard dealerCard = gameState.dealCard();
+                dealer.addCard(dealerCard);
+            }
+            processRoundOutcome();
+        }
     }
 
     private void processRoundOutcome() {
@@ -98,7 +117,9 @@ class BlackJackProtocol implements ApplicationProtocol {
                 // Checks if ongoing players have won
                 int playerScore = player.getHandScore();
                 double previousBalance = player.getBalance();
-                if (playerScore > dealerScore) {
+                if (playerScore > dealerScore && dealerScore < 21) {
+                    // Sets the player as a winner
+                    player.setIsWinner(true);
                     // Calculates the reward
                     int numberOfCards = player.getCards().size();
                     double roundBet = player.getRoundBet();

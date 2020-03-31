@@ -65,6 +65,10 @@ class ClientView extends JFrame {
         JButton hitButton = bottomBar.getHitButton();
         hitButton.setActionCommand(ClientActionType.HIT.toString());
         hitButton.addActionListener(listener);
+
+        JButton standButton = bottomBar.getStandButton();
+        standButton.setActionCommand(ClientActionType.STAND.toString());
+        standButton.addActionListener(listener);
     }
 
     public void setBet(int value, int playerSlot) {

@@ -52,7 +52,15 @@ class ClientController implements StateListener, ActionListener {
         // Updates the players views
         updatePlayerViews();
         // Update feedback
-        view.setFeedback(state.getFeedbackText());
+        updateFeedback(state.getFeedbackText());
+    }
+
+    private void updateFeedback(String serverFeedback) {
+        if (roundPhase.equals(RoundPhase.DEALER_REVEAL)) {
+            view.setFeedback(activePlayer.isWinner() ? ("You win! " + activePlayer.getRoundBet()) : "And the Dealer takes it all!");
+        } else {
+            view.setFeedback(serverFeedback);
+        }
     }
 
     private void updateNumberOfPlayersIfNeeded(List<Player> previousPlayerList, int currentNumberOfPlayers) {
@@ -89,9 +97,15 @@ class ClientController implements StateListener, ActionListener {
             case HIT:
                 requestCard();
                 break;
+            case STAND:
+                passTurn();
             default:
                 break;
         }
+    }
+
+    private void passTurn() {
+        requestSender.sendRequest(new ClientRequest.Builder(Command.STAND, activePlayer.getId()).build());
     }
 
     private void placeBet(int value) {
