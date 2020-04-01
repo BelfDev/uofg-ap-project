@@ -1,6 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * This class holds all content related to a single player.
+ * It displays the cards, player name, slot, bet value, and hand score.
+ */
 public class PlayerView extends JPanel implements CardReceiver {
 
     private static final int CARD_INSET = 20;
@@ -18,86 +22,48 @@ public class PlayerView extends JPanel implements CardReceiver {
 
     private boolean isRedLineVisible;
 
+    /**
+     * Constructs a view that represents a player.
+     *
+     * @param slot the slot where the player should be placed.
+     */
     public PlayerView(int slot) {
         this.slot = slot;
         this.isRedLineVisible = false;
-        this.setLayout(null);
         int width = Configs.CARD_SIZE.width + CARD_INSET * 4 + SCORE_LABEL_SIZE + SCORE_LABEL_LEFT_MARGIN;
+        // Configures the layout
         this.setSize(width, Configs.CARD_SIZE.height + BET_CONTAINER_HEIGHT + BET_CONTAINER_TOP_MARGIN);
+        this.setLayout(null);
 
         this.cardsCounter = 0;
 
+        // Creates the content containers
         JPanel cardsContainer = createCardsContainer();
         JPanel betContainer = createBetContainer();
-
+        // Adds the content
         add(cardsContainer);
         add(betContainer);
 
         setOpaque(false);
     }
 
+    // GETTERS
+
     public int getSlot() {
         return slot;
-    }
-
-    public JPanel getCardsContainer() {
-        return cardsContainer;
-    }
-
-    public JLabel getNameLabel() {
-        return nameLabel;
     }
 
     public void setName(String name) {
         this.nameLabel.setText(name);
     }
 
+    // SETTERS
+
     public void setBetValue(String value) {
         this.betValueLabel.setText(value);
     }
 
-    private JPanel createBetContainer() {
-        JPanel container = new JPanel(new BorderLayout());
-        container.setSize(this.getWidth(), BET_CONTAINER_HEIGHT);
-        container.setLocation(0, Configs.CARD_SIZE.height + BET_CONTAINER_TOP_MARGIN);
-
-        JLabel betLabel = new JLabel("BET");
-        betLabel.setHorizontalAlignment(JLabel.CENTER);
-        betLabel.setForeground(Color.white);
-
-        betValueLabel = new JLabel("0");
-        betValueLabel.setHorizontalAlignment(JLabel.CENTER);
-        Font f = Utils.getBoldFont(betValueLabel.getFont(), 16);
-        betValueLabel.setFont(f);
-        betValueLabel.setForeground(Color.white);
-
-        nameLabel = new JLabel();
-        nameLabel.setHorizontalAlignment(JLabel.CENTER);
-        nameLabel.setForeground(Color.orange);
-
-        container.add(betLabel, BorderLayout.NORTH);
-        container.add(betValueLabel, BorderLayout.CENTER);
-        container.add(nameLabel, BorderLayout.SOUTH);
-
-        container.setOpaque(false);
-
-        return container;
-    }
-
-    private JPanel createCardsContainer() {
-        cardsContainer = new JPanel();
-        cardsContainer.setLayout(null);
-        cardsContainer.setSize(Configs.CARD_SIZE.width + SCORE_LABEL_SIZE + SCORE_LABEL_LEFT_MARGIN, Configs.CARD_SIZE.height);
-        cardsContainer.setOpaque(false);
-
-        scoreLabel = new CardScoreView(new Dimension(SCORE_LABEL_SIZE, SCORE_LABEL_SIZE));
-        scoreLabel.setLocation(cardsContainer.getWidth() - SCORE_LABEL_SIZE, 0);
-        scoreLabel.setVisible(false);
-
-        cardsContainer.add(scoreLabel);
-
-        return cardsContainer;
-    }
+    // CARD RECEIVER IMPLEMENTATION
 
     @Override
     public int getNumberOfCards() {
@@ -157,6 +123,55 @@ public class PlayerView extends JPanel implements CardReceiver {
         this.scoreLabel.setVisible(value > 0);
         revalidate();
         repaint();
+    }
+
+    // CONTENT SETUP
+
+    private JPanel createBetContainer() {
+        // Container appearance
+        JPanel container = new JPanel(new BorderLayout());
+        container.setSize(this.getWidth(), BET_CONTAINER_HEIGHT);
+        container.setLocation(0, Configs.CARD_SIZE.height + BET_CONTAINER_TOP_MARGIN);
+
+        // Bet label
+        JLabel betLabel = new JLabel("BET");
+        betLabel.setHorizontalAlignment(JLabel.CENTER);
+        betLabel.setForeground(Color.white);
+
+        betValueLabel = new JLabel("0");
+        betValueLabel.setHorizontalAlignment(JLabel.CENTER);
+        Font f = Utils.getBoldFont(betValueLabel.getFont(), 16);
+        betValueLabel.setFont(f);
+        betValueLabel.setForeground(Color.white);
+
+        // Name label
+        nameLabel = new JLabel();
+        nameLabel.setHorizontalAlignment(JLabel.CENTER);
+        nameLabel.setForeground(Color.orange);
+
+        // Adds content
+        container.add(betLabel, BorderLayout.NORTH);
+        container.add(betValueLabel, BorderLayout.CENTER);
+        container.add(nameLabel, BorderLayout.SOUTH);
+
+        container.setOpaque(false);
+
+        return container;
+    }
+
+    private JPanel createCardsContainer() {
+        cardsContainer = new JPanel();
+        cardsContainer.setLayout(null);
+        cardsContainer.setSize(Configs.CARD_SIZE.width + SCORE_LABEL_SIZE + SCORE_LABEL_LEFT_MARGIN, Configs.CARD_SIZE.height);
+        cardsContainer.setOpaque(false);
+
+        scoreLabel = new CardScoreView(new Dimension(SCORE_LABEL_SIZE, SCORE_LABEL_SIZE));
+        scoreLabel.setLocation(cardsContainer.getWidth() - SCORE_LABEL_SIZE, 0);
+        scoreLabel.setVisible(false);
+
+        cardsContainer.add(scoreLabel);
+
+        return cardsContainer;
     }
 
 }
