@@ -2,21 +2,29 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * This class encapsulates the content of the TopBarView.
- * It provides visual feedback on the player's current credit
+ * This class encapsulates the contents of the TopBarView.
+ * It provides a visual feedback on the player's current credit
  * balance, game play status, and number of players in the table.
  */
 class TopBarView extends JPanel {
+
+    private static final String WELCOME_MESSAGE = "Welcome to the Black Jack game!";
+    private static final String BALANCE_TEXT = "BALANCE";
+    private static final String NUMBER_OF_PLAYERS_TEXT = "BALANCE";
 
     private JLabel balanceValueLabel;
     private JLabel feedbackLabel;
     private JLabel playersValueLabel;
 
+    /**
+     * Constructs a TopBarView that provides text feedback about the
+     * ongoing game dynamics.
+     */
     public TopBarView() {
         // Sets the bottom bar height
         Dimension size = new Dimension(0, Configs.TOP_BAR_HEIGHT);
         this.setPreferredSize(size);
-        // Sets the layout manager to a GridLayout
+        // Sets the layout manager to GridLayout
         GridLayout gridLayout = new GridLayout(0, 3);
         this.setLayout(gridLayout);
         // Sets the bottom bar top border
@@ -27,19 +35,7 @@ class TopBarView extends JPanel {
         addPanels();
     }
 
-    // Getters
-
-    public JLabel getBalanceValueLabel() {
-        return balanceValueLabel;
-    }
-
-    public JLabel getFeedbackLabel() {
-        return feedbackLabel;
-    }
-
-    public JLabel getPlayersValueLabel() {
-        return playersValueLabel;
-    }
+    // SETTERS
 
     public void setPlayersValueLabelText(String value) {
         this.playersValueLabel.setText(value);
@@ -53,7 +49,7 @@ class TopBarView extends JPanel {
         this.feedbackLabel.setText(feedback);
     }
 
-    // Content setup
+    // CONTENT SETUP
 
     private void addPanels() {
         // Balance panel
@@ -62,23 +58,18 @@ class TopBarView extends JPanel {
         balanceContainer.setOpaque(false);
         balanceContainer.setLayout(balanceLayout);
 
-        JLabel balanceLabel = createLabel("BALANCE");
+        JLabel balanceLabel = createLabel(BALANCE_TEXT);
         Font customizedFont = Utils.getBoldFont(balanceLabel.getFont(), Configs.TOP_BAR_STATIC_LABEL_FONT_SIZE);
         balanceLabel.setFont(customizedFont);
         balanceValueLabel = createLabel("0");
-
-        balanceContainer.add(Box.createVerticalGlue());
-        balanceContainer.add(balanceLabel);
-        balanceContainer.add(Box.createVerticalGlue());
-        balanceContainer.add(balanceValueLabel);
-        balanceContainer.add(Box.createVerticalGlue());
+        addContentToPanel(balanceContainer, balanceLabel, balanceValueLabel);
 
         // Feedback panel
         JPanel feedbackContainer = new JPanel(new GridBagLayout());
         feedbackContainer.setBorder(BorderFactory.createMatteBorder(0, 8, 0, 8, Configs.TOP_BAR_BORDER_COLOR));
         feedbackContainer.setOpaque(false);
 
-        feedbackLabel = createLabel("Welcome to the Black Jack game!");
+        feedbackLabel = createLabel(WELCOME_MESSAGE);
         feedbackContainer.add(feedbackLabel);
 
         // Players panel
@@ -87,19 +78,26 @@ class TopBarView extends JPanel {
         playersPanel.setLayout(playersLayout);
         playersPanel.setOpaque(false);
 
-        JLabel playersLabel = createLabel("NUMBER OF PLAYERS");
+        JLabel playersLabel = createLabel(NUMBER_OF_PLAYERS_TEXT);
         playersLabel.setFont(customizedFont);
-        playersValueLabel = createLabel("2");
+        playersValueLabel = createLabel("0");
 
-        playersPanel.add(Box.createVerticalGlue());
-        playersPanel.add(playersLabel);
-        playersPanel.add(Box.createVerticalGlue());
-        playersPanel.add(playersValueLabel);
-        playersPanel.add(Box.createVerticalGlue());
+        addContentToPanel(playersPanel, playersLabel, playersValueLabel);
 
+        // Adds content
         add(balanceContainer);
         add(feedbackContainer);
         add(playersPanel);
+    }
+
+    // CONVENIENCE METHODS
+
+    private void addContentToPanel(JPanel panel, JLabel topLabel, JLabel bottomLabel) {
+        panel.add(Box.createVerticalGlue());
+        panel.add(topLabel);
+        panel.add(Box.createVerticalGlue());
+        panel.add(bottomLabel);
+        panel.add(Box.createVerticalGlue());
     }
 
     private JLabel createLabel(String text) {
