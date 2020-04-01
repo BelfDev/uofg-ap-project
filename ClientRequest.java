@@ -2,6 +2,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This class represents the request model accepted by the server.
+ * It provides a Builder constructor for convenience.
+ */
 public class ClientRequest implements Serializable {
 
     private Command command;
@@ -23,6 +27,9 @@ public class ClientRequest implements Serializable {
         return payload;
     }
 
+    /**
+     * Builder used to create an instance of a ClientRequest.
+     */
     public static class Builder {
 
         private Command command;
