@@ -36,7 +36,7 @@ public class DealerView extends JPanel implements CardReceiver {
         this.add(scoreContainer);
     }
 
-    // Getters
+    // GETTERS
 
     public CardScoreView getScoreView() {
         return scoreView;
@@ -81,7 +81,7 @@ public class DealerView extends JPanel implements CardReceiver {
         repaint();
     }
 
-    // Content setup
+    // CONTENT SETUP
 
     private JPanel createCardsContainer() {
         // Creates a JPanel to hold the dealer cards
