@@ -164,8 +164,7 @@ public class Player implements Serializable {
         }
         return score;
     }
-
-
+    
     @Override
     public String toString() {
         // Simplified description of a Player

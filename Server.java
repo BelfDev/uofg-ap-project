@@ -1,7 +1,7 @@
 /**
  * Server application entry point. Creates and starts the server thread.
- * 
- * Author: Pedro Henrique Belfort Fernandes 
+ * <p>
+ * Author: Pedro Henrique Belfort Fernandes
  * Matric: 2456943B
  */
 class Server {

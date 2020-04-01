@@ -1,3 +1,7 @@
+/**
+ * This enumeration represents all the suit marks available
+ * in traditional playing cards.
+ */
 public enum SuitMark {
     DIAMONDS, CLUBS, HEARTS, SPADES;
 

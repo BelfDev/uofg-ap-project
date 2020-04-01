@@ -2,6 +2,9 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 
+/**
+ * This utility class provides commonly used convenience methods.
+ */
 public class Utils {
 
     private Utils() {

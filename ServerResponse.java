@@ -1,5 +1,9 @@
 import java.io.Serializable;
 
+/**
+ * This class represents the server response understood by the client.
+ * It contains the response status and the updated game state.
+ */
 public class ServerResponse implements Serializable {
 
     private ResponseStatus status;
