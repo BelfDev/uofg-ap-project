@@ -1,10 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
 
 class ClientView extends JFrame {
 
@@ -28,6 +26,19 @@ class ClientView extends JFrame {
 
     public DealerView getDealerView() {
         return mainContent.getDealerView();
+    }
+
+    public void disableDoubleButton(boolean disable) {
+        bottomBar.getDoubleButton().setEnabled(!disable);
+    }
+
+    public void disableResetBetButton(boolean disable) {
+        bottomBar.getResetBetButton().setEnabled(!disable);
+    }
+
+    public void disableHitAndStand(boolean disable) {
+        bottomBar.getHitButton().setEnabled(!disable);
+        bottomBar.getStandButton().setEnabled(!disable);
     }
 
     public void setBalance(String balance) {
@@ -73,6 +84,10 @@ class ClientView extends JFrame {
         JButton doubleButton = bottomBar.getDoubleButton();
         doubleButton.setActionCommand(ClientActionType.DOUBLE.toString());
         doubleButton.addActionListener(listener);
+
+        JButton resetBetButton = bottomBar.getResetBetButton();
+        resetBetButton.setActionCommand(ClientActionType.RESET_BET.toString());
+        resetBetButton.addActionListener(listener);
     }
 
     public void setBet(int value, int playerSlot) {

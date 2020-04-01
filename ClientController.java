@@ -53,11 +53,18 @@ class ClientController implements StateListener, ActionListener {
         removeQuitPlayers(previousPlayerState);
         // Updates the dealer
         updateDealerView(state.getDealer());
-        System.out.println("\n\n" + state.getDealer().getHandScore() + "\n\n");
         // Updates the players views
         updatePlayerViews();
+        // Update buttons
+        updateButtons(roundPhase);
         // Update feedback
         updateFeedback(state.getFeedbackText());
+    }
+
+    private void updateButtons(RoundPhase phase) {
+        view.disableDoubleButton(!phase.equals(RoundPhase.PLAYER_ACTION));
+        view.disableResetBetButton(!phase.equals(RoundPhase.INITIAL_BET));
+        view.disableHitAndStand(phase.equals(RoundPhase.DEALER_REVEAL));
     }
 
     private void updateFeedback(String serverFeedback) {
@@ -104,6 +111,11 @@ class ClientController implements StateListener, ActionListener {
                     placeBet(value);
                 }
                 break;
+            case RESET_BET:
+                if (roundPhase == RoundPhase.INITIAL_BET) {
+                    requestSender.sendRequest(new ClientRequest.Builder(Command.RESET_BET, activePlayer.getId()).build());
+                }
+                break;
             case HIT:
                 requestCard();
                 break;
@@ -128,7 +140,9 @@ class ClientController implements StateListener, ActionListener {
     }
 
     private void passTurn() {
-        requestSender.sendRequest(new ClientRequest.Builder(Command.STAND, activePlayer.getId()).build());
+        if (roundPhase.equals(RoundPhase.PLAYER_ACTION)) {
+            requestSender.sendRequest(new ClientRequest.Builder(Command.STAND, activePlayer.getId()).build());
+        }
     }
 
     private void placeBet(int value) {

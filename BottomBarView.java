@@ -21,7 +21,7 @@ class BottomBarView extends JPanel {
     private JButton hitButton;
     private JButton standButton;
     private JButton doubleButton;
-    private JButton splitButton;
+    private JButton resetBetButton;
 
     private JButton quitButton;
 
@@ -61,8 +61,8 @@ class BottomBarView extends JPanel {
         return doubleButton;
     }
 
-    public JButton getSplitButton() {
-        return splitButton;
+    public JButton getResetBetButton() {
+        return resetBetButton;
     }
 
     public JButton getQuitButton() {
@@ -130,7 +130,7 @@ class BottomBarView extends JPanel {
         hitButton = createActionButton("HIT");
         standButton = createActionButton("STAND");
         doubleButton = createActionButton("DOUBLE");
-        splitButton = createActionButton("SPLIT");
+        resetBetButton = createActionButton("RESET\nBET");
 
         final int buttonMargin = 16;
         buttonsContainer.add(hitButton);
@@ -139,7 +139,7 @@ class BottomBarView extends JPanel {
         buttonsContainer.add(Box.createHorizontalStrut(buttonMargin));
         buttonsContainer.add(doubleButton);
         buttonsContainer.add(Box.createHorizontalStrut(buttonMargin));
-        buttonsContainer.add(splitButton);
+        buttonsContainer.add(resetBetButton);
 
         container.add(buttonsContainer);
 

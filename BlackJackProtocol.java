@@ -36,16 +36,14 @@ class BlackJackProtocol implements ApplicationProtocol {
                 } else if (gameState.getBottleneck().getId().equals(requestPlayer.getId()) && requestPlayer.getHandScore() < 21) {
                     // Deals a card
                     dealOneCard(requestPlayer, requestRoundPhase);
-
-//                    if (gameState.getEliminatedPlayers().size() == Configs.MAX_NUMBER_OF_PLAYERS) {
-//                        gameState.advanceRound();
-//                    }
                 }
                 updateDealerIfNeeded();
                 break;
             case STAND:
-                passTurn(requestPlayer.getId(), requestRoundPhase);
-                updateDealerIfNeeded();
+                if (gameState.getBottleneck().getId().equals(requestPlayer.getId())) {
+                    passTurn(requestPlayer.getId(), requestRoundPhase);
+                    updateDealerIfNeeded();
+                }
                 break;
             case DOUBLE_DOWN:
                 if (gameState.getBottleneck().getId().equals(requestPlayer.getId())) {
@@ -61,6 +59,15 @@ class BlackJackProtocol implements ApplicationProtocol {
                     }
                     updateDealerIfNeeded();
                 }
+                break;
+            case RESET_BET:
+                if (gameState.getRoundPhase().equals(RoundPhase.INITIAL_BET)) {
+                    double balance = requestPlayer.getBalance();
+                    int currentBet = requestPlayer.getRoundBet();
+                    requestPlayer.setBalance(balance + currentBet);
+                    requestPlayer.resetRoundBet();
+                }
+                break;
         }
 
         return new ServerResponse(ResponseStatus.OK, gameState);

@@ -1,3 +1,9 @@
 public enum Command {
-    JOIN, QUIT, BET, HIT, STAND, DOUBLE_DOWN;
+    JOIN,
+    QUIT,
+    BET,
+    HIT,
+    STAND,
+    DOUBLE_DOWN,
+    RESET_BET;
 }
