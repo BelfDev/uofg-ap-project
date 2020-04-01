@@ -13,12 +13,14 @@ import java.util.Observable;
  */
 class BlackJackService extends Observable implements Runnable {
 
-    private static final int RESTART_ROUND_DELAY = 5000;
-
+    private static final int RESTART_ROUND_DELAY = 4000;
+    // Shared game state
     private final GameState gameState;
+    // Client connection socket
     private final Socket clientSocket;
-
+    // Boolean flag to indicate if a service is alive
     private boolean isAlive;
+    // I/O object streams
     private ObjectOutputStream output;
     private ObjectInputStream input;
 
@@ -43,6 +45,11 @@ class BlackJackService extends Observable implements Runnable {
         this.input = new ObjectInputStream(clientSocket.getInputStream());
     }
 
+    /**
+     * Indicates if this service is still alive or if the user has quit.
+     *
+     * @return a boolean value indicating if the service is still alive.
+     */
     public boolean isAlive() {
         return isAlive;
     }
@@ -51,13 +58,13 @@ class BlackJackService extends Observable implements Runnable {
     public void run() {
         ClientRequest clientRequest;
         try {
-            // Initiates the application communication protocol
+            // Initiates the application protocol
             BlackJackProtocol blackJackProtocol = new BlackJackProtocol(gameState);
             // Continuously watches for client input
             while ((clientRequest = (ClientRequest) input.readObject()) != null) {
-                // Generates a server response based on the BlackJackProtocol interpretation
+                // Generates a server response based on the BlackJackProtocol processing
                 ServerResponse response = blackJackProtocol.processInput(clientRequest);
-                // Indicates the service should be torn down
+                // Checks whether the service should be torn down
                 if (clientRequest.getCommand() == Command.QUIT) {
                     this.isAlive = false;
                 }
@@ -82,25 +89,6 @@ class BlackJackService extends Observable implements Runnable {
 
     }
 
-    private void endRoundIfNeeded() {
-        if (gameState.getRoundPhase().equals(RoundPhase.DEALER_REVEAL)) {
-            // Notifies the server after
-            ActionListener taskPerformer = evt -> {
-                gameState.advanceRound();
-                gameState.resetDealer();
-                notifyResponse(new ServerResponse(ResponseStatus.OK, gameState));
-            };
-            Timer timer = new Timer(RESTART_ROUND_DELAY, taskPerformer);
-            timer.setRepeats(false);
-            timer.start();
-        }
-    }
-
-    private void notifyResponse(ServerResponse response) {
-        setChanged();
-        notifyObservers(response);
-    }
-
     /**
      * Sends out the server response as an ObjectOutputStream
      *
@@ -116,6 +104,27 @@ class BlackJackService extends Observable implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    // CONVENIENCE METHODS
+
+    private void endRoundIfNeeded() {
+        // Sets an asynchronous trigger that restarts the game after 4 seconds
+        if (gameState.getRoundPhase().equals(RoundPhase.DEALER_REVEAL)) {
+            ActionListener taskPerformer = evt -> {
+                gameState.advanceRound();
+                gameState.resetDealer();
+                notifyResponse(new ServerResponse(ResponseStatus.OK, gameState));
+            };
+            Timer timer = new Timer(RESTART_ROUND_DELAY, taskPerformer);
+            timer.setRepeats(false);
+            timer.start();
+        }
+    }
+
+    private void notifyResponse(ServerResponse response) {
+        setChanged();
+        notifyObservers(response);
     }
 
 }

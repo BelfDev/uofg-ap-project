@@ -1,3 +1,6 @@
+/**
+ * This interface enforces the implementation of an ApplicationProtocol.
+ */
 interface ApplicationProtocol {
-    public ServerResponse processInput(ClientRequest request);
+    ServerResponse processInput(ClientRequest request);
 }
