@@ -7,16 +7,27 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * This class orchestrates the game play on the client side.
+ * It receives instructions from the server and modifies the views
+ * accordingly.
+ */
 class ClientController implements StateListener, ActionListener {
 
     private ClientView view;
     private RequestSender requestSender;
     private Player activePlayer;
     private List<Player> playerList;
-
     private RoundPhase roundPhase;
     private boolean isBetDoubled;
 
+    /**
+     * Constructs a ClientController that sets the game play behavior according
+     * to instructions (game state) coming from the server.
+     *
+     * @param view          the game view to be controller.
+     * @param requestSender an implementation of the RequestSender interface.
+     */
     public ClientController(ClientView view, RequestSender requestSender) {
         this.view = view;
         this.requestSender = requestSender;
@@ -24,7 +35,9 @@ class ClientController implements StateListener, ActionListener {
         this.playerList = null;
         this.roundPhase = null;
         this.isBetDoubled = false;
+
         view.setActionListener(this);
+        // Sets the behavior in case the user closes the app window
         view.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -33,19 +46,21 @@ class ClientController implements StateListener, ActionListener {
         });
     }
 
+    // STATE MANAGEMENT
+
     @Override
     public void onReceiveState(GameState state) {
-        System.out.println("RECEIVED NEW STATE");
-        System.out.println(state);
+        // Receives state new state from the server and updates the view
+        System.out.println("NEW STATE RECEIVED");
         // Updates the round phase
         roundPhase = state.getRoundPhase();
-        // Stores previous player state
+        // Stores the previous player state
         List<Player> previousPlayerState = playerList;
-        // Updates the player state
+        // Updates the current player state
         playerList = state.getPlayers();
         // Initializes this client's player view
         initActivePlayerIfNeeded();
-        // Updates current player reference
+        // Updates active player reference
         activePlayer = state.getPlayer(activePlayer.getId());
         // Updates the number of players
         updateNumberOfPlayersIfNeeded(previousPlayerState, state.getNumberOfPlayers());
@@ -53,52 +68,18 @@ class ClientController implements StateListener, ActionListener {
         removeQuitPlayers(previousPlayerState);
         // Updates the dealer
         updateDealerView(state.getDealer());
-        // Updates the players views
+        // Updates players views
         updatePlayerViews();
-        // Update buttons
+        // Updates buttons
         updateButtons(roundPhase);
-        // Update feedback
+        // Updates feedback
         updateFeedback(state.getFeedbackText());
     }
 
-    private void updateButtons(RoundPhase phase) {
-        view.disableDoubleButton(!phase.equals(RoundPhase.PLAYER_ACTION));
-        view.disableResetBetButton(!phase.equals(RoundPhase.INITIAL_BET));
-        view.disableHitAndStand(phase.equals(RoundPhase.DEALER_REVEAL));
-    }
-
-    private void updateFeedback(String serverFeedback) {
-        String feedback = serverFeedback;
-        if (roundPhase.equals(RoundPhase.DEALER_REVEAL)) {
-            if (activePlayer.isPush()) {
-                feedback = "It's a draw! You don't lose anything.";
-            } else {
-                feedback = activePlayer.isWinner() ? "You win! " : "The Dealer takes it all! ";
-                feedback += " The round will restart shortly.";
-            }
-        }
-        view.setFeedback(feedback);
-    }
-
-    private void updateNumberOfPlayersIfNeeded(List<Player> previousPlayerList, int currentNumberOfPlayers) {
-        if (previousPlayerList == null || previousPlayerList.size() != currentNumberOfPlayers) {
-            String numberOfPlayersText = String.valueOf(currentNumberOfPlayers);
-            view.updateNumberOfPlayersLabel(numberOfPlayersText);
-            System.out.println("Number of players changed to " + currentNumberOfPlayers);
-        }
-    }
-
-    private void initActivePlayerIfNeeded() {
-        if (activePlayer == null) {
-            activePlayer = playerList.get(playerList.size() - 1);
-            view.addNewPlayer("You", activePlayer.getSlot());
-            System.out.println("Current player ID: " + activePlayer.getId());
-        }
-    }
+    // BUTTON ACTIONS
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
         ClientActionType action = ClientActionType.valueOf(e.getActionCommand());
         System.out.println(action.toString());
         try {
@@ -132,6 +113,43 @@ class ClientController implements StateListener, ActionListener {
             }
         } catch (Exception ex) {
             System.out.println("Unfortunately, you are not connected to the black jack server. Close this client and try again.");
+        }
+    }
+
+    // CONTENT UPDATE
+
+    private void updateButtons(RoundPhase phase) {
+        view.disableDoubleButton(!phase.equals(RoundPhase.PLAYER_ACTION));
+        view.disableResetBetButton(!phase.equals(RoundPhase.INITIAL_BET));
+        view.disableHitAndStand(phase.equals(RoundPhase.DEALER_REVEAL));
+    }
+
+    private void updateFeedback(String serverFeedback) {
+        String feedback = serverFeedback;
+        if (roundPhase.equals(RoundPhase.DEALER_REVEAL)) {
+            if (activePlayer.isPush()) {
+                feedback = "It's a draw! You don't lose anything.";
+            } else {
+                feedback = activePlayer.isWinner() ? "You win! " : "The Dealer takes it all! ";
+                feedback += " The round will restart shortly.";
+            }
+        }
+        view.setFeedback(feedback);
+    }
+
+    private void updateNumberOfPlayersIfNeeded(List<Player> previousPlayerList, int currentNumberOfPlayers) {
+        if (previousPlayerList == null || previousPlayerList.size() != currentNumberOfPlayers) {
+            String numberOfPlayersText = String.valueOf(currentNumberOfPlayers);
+            view.updateNumberOfPlayersLabel(numberOfPlayersText);
+            System.out.println("Number of players changed to " + currentNumberOfPlayers);
+        }
+    }
+
+    private void initActivePlayerIfNeeded() {
+        if (activePlayer == null) {
+            activePlayer = playerList.get(playerList.size() - 1);
+            view.addNewPlayer("You", activePlayer.getSlot());
+            System.out.println("Current player ID: " + activePlayer.getId());
         }
     }
 
