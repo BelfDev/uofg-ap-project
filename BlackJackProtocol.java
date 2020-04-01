@@ -122,51 +122,52 @@ class BlackJackProtocol implements ApplicationProtocol {
         List<Player> players = gameState.getOngoingPlayers();
         Dealer dealer = gameState.getDealer();
         int dealerScore = dealer.getHandScore();
-        // Checks if the dealer has a black jack
-        if (dealerScore == 21 && dealer.getCards().size() == 2) {
-            gameState.setFeedbackText("The dealer has a Black Jack!");
-        } else {
-            // TODO: Set game state feedback
-            System.out.println("\n\n DEALER SCORE:");
-            System.out.println(dealerScore);
+        boolean dealerHasBlackJack = dealerScore == 21 && dealer.getCards().size() == 2;
+        System.out.println("\n\n DEALER SCORE:");
+        System.out.println(dealerScore);
 
-            players.forEach(player -> {
-                // Checks if ongoing players have won
-                int playerScore = player.getHandScore();
-                double previousBalance = player.getBalance();
-                System.out.println("\n\n PLAYER SCORE:");
-                System.out.println(playerScore);
+        players.forEach(player -> {
+            // Checks if ongoing players have won
+            int playerScore = player.getHandScore();
+            double previousBalance = player.getBalance();
 
-                if (playerScore > dealerScore && dealerScore < 21) {
-                    // Sets the player as a winner
-                    player.setIsWinner(true);
-                    // Calculates the reward
-                    int numberOfCards = player.getCards().size();
-                    double roundBet = player.getRoundBet();
-                    // If player has a black jack, he gets paid 3 to 2.
-                    // Otherwise, he gets paid 2 to 1.
-                    double reward = numberOfCards == 2 ? roundBet * 1.5 : roundBet;
-                    player.setBalance(previousBalance + roundBet + reward);
-                } else if (playerScore == dealerScore && dealerScore <= 21) {
-                    // This is a draw (push)
-                    player.setIsPush(true);
-                    player.setBalance(previousBalance + player.getRoundBet());
-                } else if (playerScore <= 21 && dealerScore > 21) {
-                    // The dealer busted
-                    player.setIsWinner(true);
-                    player.setBalance(previousBalance + player.getRoundBet() * 2);
-                }
+            boolean playerHasBlackJack = playerScore == 21 && player.getCards().size() == 2;
+            boolean dealerHasTwentyOneSum = !dealerHasBlackJack && dealerScore == 21;
+            boolean playerHasHigherScore = playerScore > dealerScore && dealerScore < 21;
 
-                System.out.println("\n\n PLAYER STATUS:");
-                System.out.println("\n WIN?");
-                System.out.println(player.isWinner());
-                System.out.println("\n DRAW?");
-                System.out.println(player.isPush());
+            System.out.println("\n\n PLAYER SCORE:");
+            System.out.println(playerScore);
 
-                // Resets the round bet
-                player.resetRoundBet();
-            });
-        }
+            if (playerHasHigherScore || (playerHasBlackJack && dealerHasTwentyOneSum)) {
+                // Sets the player as a winner
+                player.setIsWinner(true);
+                // Calculates the reward
+                int numberOfCards = player.getCards().size();
+                double roundBet = player.getRoundBet();
+                // If player has a black jack, he gets paid 3 to 2.
+                // Otherwise, he gets paid 2 to 1.
+                double reward = numberOfCards == 2 ? roundBet * 1.5 : roundBet;
+                player.setBalance(previousBalance + roundBet + reward);
+            } else if (playerScore == dealerScore && dealerScore <= 21) {
+                // This is a draw (push)
+                player.setIsPush(true);
+                player.setBalance(previousBalance + player.getRoundBet());
+            } else if (playerScore <= 21 && dealerScore > 21) {
+                // The dealer busted
+                player.setIsWinner(true);
+                player.setBalance(previousBalance + player.getRoundBet() * 2);
+            }
+
+            System.out.println("\n\n PLAYER STATUS:");
+            System.out.println("\n WIN?");
+            System.out.println(player.isWinner());
+            System.out.println("\n DRAW?");
+            System.out.println(player.isPush());
+
+            // Resets the round bet
+            player.resetRoundBet();
+        });
+
     }
 
 }
