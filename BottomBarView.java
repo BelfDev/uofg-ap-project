@@ -4,27 +4,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class encapsulates the content of the BottomBarView.
+ * This class encapsulates the contents of the BottomBarView.
  * It provides the player with game controls to bet chips and
- * take game play actions such as DEAL, STAND, DOUBLE, and SPLIT.
+ * perform actions such as DEAL, STAND, DOUBLE, and SPLIT.
  * It also enables the player to QUIT the game.
  */
 class BottomBarView extends JPanel {
 
     private static final String INSTRUCTION_LABEL_TEXT = "Click on the chip to bet";
 
+    // Chip buttons
     private JButton yellowChipButton;
     private JButton redChipButton;
     private JButton greenChipButton;
     private JButton blueChipButton;
 
+    // Control buttons
     private JButton hitButton;
     private JButton standButton;
     private JButton doubleButton;
     private JButton resetBetButton;
-
     private JButton quitButton;
 
+    /**
+     * Constructs the BottomBarView with game controls.
+     */
     public BottomBarView() {
         // Sets the bottom bar height
         Dimension size = new Dimension(0, Configs.BOTTOM_BAR_HEIGHT);
@@ -38,7 +42,7 @@ class BottomBarView extends JPanel {
         addPanels();
     }
 
-    // Getters
+    // GETTERS
 
     public List<JButton> getChipButtons() {
         return new ArrayList<JButton>() {{
@@ -69,7 +73,7 @@ class BottomBarView extends JPanel {
         return quitButton;
     }
 
-    // Root container setup
+    // CONTAINER APPEARANCE
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -92,7 +96,7 @@ class BottomBarView extends JPanel {
         add(createOptionsPanel());
     }
 
-    // Content panel creation
+    // CONTENT CREATION
 
     private JPanel createOptionsPanel() {
         // Creates the container panel
