@@ -3,21 +3,32 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+
+/**
+ * This class is the model game state. It is meant to be shared among all
+ * client connections and should always be kept consistent -- therefore,
+ * its implementation is Thread Safe.
+ */
 public class GameState implements Serializable {
 
     public static final String AWAITING_PLAYER_MESSAGE = "Waiting for player in slot ";
     private static final String AWAITING_FOR_BETS = "Please place your bets. Hit to confirm.";
 
     private AtomicReference<RoundPhase> roundPhase;
-    // Indicates the game bottleneck (i.e. which player everyone is waiting for)
+    // Mao to conveniently access players by their unique identifier strings
     private Map<String, Player> playerMap;
     private Stack<Integer> availableSlots;
+    // Indicates the game bottleneck (i.e. which player everyone is waiting for)
     private AtomicReference<Player> bottleneck;
 
     private AtomicReference<Dealer> dealer;
     private Stack<PlayingCard> deck;
     private AtomicReference<String> feedbackText;
 
+    /**
+     * Constructs a thread safe model representation of the game state. This
+     * class also provides some convenience methods ot manipulate such state.
+     */
     public GameState() {
         this.playerMap = Collections.synchronizedMap(new LinkedHashMap<>());
         this.roundPhase = new AtomicReference<>(RoundPhase.INITIAL_BET);
@@ -28,21 +39,10 @@ public class GameState implements Serializable {
         this.feedbackText = new AtomicReference<>(AWAITING_FOR_BETS);
     }
 
-    public synchronized int getNumberOfPlayers() {
-        return playerMap.size();
-    }
+    // TRADITIONAL GETTERS
 
     public RoundPhase getRoundPhase() {
         return roundPhase.get();
-    }
-
-    public synchronized List<Player> getPlayers() {
-        return new ArrayList<>(playerMap.values());
-    }
-
-    public synchronized Player getPlayer(String id) {
-        if (id == null) return null;
-        return playerMap.getOrDefault(id, null);
     }
 
     public Dealer getDealer() {
@@ -53,8 +53,23 @@ public class GameState implements Serializable {
         return bottleneck.get();
     }
 
-    public void setBottleneck(Player player) {
-        this.bottleneck.set(player);
+    public String getFeedbackText() {
+        return feedbackText.get();
+    }
+
+    // CONVENIENCE GETTERS
+
+    public synchronized int getNumberOfPlayers() {
+        return playerMap.size();
+    }
+
+    public synchronized List<Player> getPlayers() {
+        return new ArrayList<>(playerMap.values());
+    }
+
+    public synchronized Player getPlayer(String id) {
+        if (id == null) return null;
+        return playerMap.getOrDefault(id, null);
     }
 
     public synchronized List<Player> getBottlenecks() {
@@ -69,13 +84,30 @@ public class GameState implements Serializable {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public String getFeedbackText() {
-        return feedbackText.get();
+    public synchronized Player getNextBottleneck() {
+        return playerMap.values().stream()
+                .filter(Player::isBottleneck)
+                .max(Comparator.comparing(Player::getSlot))
+                .orElse(null);
+    }
+
+    public synchronized List<Player> getEliminatedPlayers() {
+        return playerMap.values().stream()
+                .filter(Player::isEliminated)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    // SETTERS
+
+    public void setBottleneck(Player player) {
+        this.bottleneck.set(player);
     }
 
     public void setFeedbackText(String feedback) {
         this.feedbackText.set(feedback);
     }
+
+    // OPERATIONS
 
     public synchronized void addNewPlayer() {
         String playerId = UUID.randomUUID().toString();
@@ -116,23 +148,6 @@ public class GameState implements Serializable {
         this.dealer = new AtomicReference<>(new Dealer());
     }
 
-    private RoundPhase getNextRoundPhase() {
-        RoundPhase nextRoundPhase;
-        if (roundPhase.get() == RoundPhase.DEALER_REVEAL) {
-            nextRoundPhase = RoundPhase.INITIAL_BET;
-        } else {
-            int currentOrder = roundPhase.get().getOrder();
-            nextRoundPhase = RoundPhase.getRoundOfOrder(++currentOrder);
-        }
-        return nextRoundPhase;
-    }
-
-    public synchronized Player getNextBottleneck() {
-        return playerMap.values().stream()
-                .filter(Player::isBottleneck)
-                .max(Comparator.comparing(Player::getSlot))
-                .orElse(null);
-    }
 
     public synchronized PlayingCard dealCard() {
         return deck.pop();
@@ -151,11 +166,7 @@ public class GameState implements Serializable {
         }
     }
 
-    public synchronized List<Player> getEliminatedPlayers() {
-        return playerMap.values().stream()
-                .filter(Player::isEliminated)
-                .collect(Collectors.toCollection(ArrayList::new));
-    }
+    // CONVENIENCE METHODS
 
     private Stack<Integer> createSlots() {
         // Creates a stack with available slot numbers that will be consulted when positioning players
@@ -164,6 +175,17 @@ public class GameState implements Serializable {
             availableSlots.add(i);
         }
         return availableSlots;
+    }
+
+    private RoundPhase getNextRoundPhase() {
+        RoundPhase nextRoundPhase;
+        if (roundPhase.get() == RoundPhase.DEALER_REVEAL) {
+            nextRoundPhase = RoundPhase.INITIAL_BET;
+        } else {
+            int currentOrder = roundPhase.get().getOrder();
+            nextRoundPhase = RoundPhase.getRoundOfOrder(++currentOrder);
+        }
+        return nextRoundPhase;
     }
 
     private void updateNewRoundFeedback() {
@@ -178,12 +200,13 @@ public class GameState implements Serializable {
 
     @Override
     public String toString() {
+        // Simplified description of the game state
         return "GameState{" +
                 "\n roundPhase=" + roundPhase +
                 ",\n availableSlots=" + availableSlots +
                 ",\n bottleneck=" + bottleneck +
                 ",\n numberOfPlayers=" + getPlayers().size() +
-                ",\n feedbackText=" + feedbackText +
                 '}';
     }
+
 }
