@@ -72,7 +72,7 @@ class ClientApp implements RequestSender {
             // Sends out initial request notifying the server about a new player
             sendRequest(joinRequest);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Could not connect to the black jack server. The room might be full, come back later.");
         }
     }
 

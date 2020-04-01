@@ -16,6 +16,8 @@ class GameServerThread extends Thread implements Observer {
     private final GameState sharedState;
     // A collection of live black jack services
     private ArrayList<BlackJackService> services = new ArrayList<>();
+    // Controls the number of clients
+    private int numberOfClients = 0;
 
     public GameServerThread() {
         this.sharedState = new GameState();
@@ -23,13 +25,11 @@ class GameServerThread extends Thread implements Observer {
 
     @Override
     public void run() {
-        // Indicates that the server is open for clients through the SERVER_PORT
-        boolean openToClients = true;
         // Creates a server socket with SERVER_PORT. The try-with-resources statement
         // automatically closes the socket when necessary in runtime
         try (ServerSocket serverSocket = new ServerSocket(Configs.SERVER_PORT)) {
             // Awaits indefinitely for a client connection
-            while (openToClients) {
+            while (numberOfClients <= Configs.MAX_NUMBER_OF_PLAYERS) {
                 // Establishes a new client socket connection
                 Socket clientSocket = serverSocket.accept();
                 // Creates a new black jack service
@@ -41,6 +41,8 @@ class GameServerThread extends Thread implements Observer {
                 Thread blackJackServiceThread = new Thread(blackJackService);
                 // Indicates in the console that a new client has connected to the server
                 System.out.println("New client connected at " + blackJackServiceThread.getName());
+                // Increases the number of clients counter
+                numberOfClients++;
                 // Starts the black jack service thread execution
                 blackJackServiceThread.start();
             }
@@ -49,19 +51,6 @@ class GameServerThread extends Thread implements Observer {
         }
 
     }
-
-//    @Override
-//    public void update(Observable o, Object arg) {
-//        ServerResponse response = (ServerResponse) arg;
-//        // Triggers the transmission of the response in all live services
-//        for (BlackJackService service : services) {
-//            if (service != null && service.isAlive()) {
-//                service.transmitMessage(response);
-//            } else if (service != null && !service.isAlive()) {
-//                services.remove(service);
-//            }
-//        }
-//    }
 
     @Override
     public void update(Observable o, Object arg) {
@@ -75,6 +64,7 @@ class GameServerThread extends Thread implements Observer {
         }
         if (!origin.isAlive()) {
             services.remove(origin);
+            numberOfClients--;
         }
     }
 

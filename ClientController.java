@@ -98,35 +98,40 @@ class ClientController implements StateListener, ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
         ClientActionType action = ClientActionType.valueOf(e.getActionCommand());
         System.out.println(action.toString());
-        switch (action) {
-            case QUIT_GAME:
-                view.dispatchEvent(new WindowEvent(view, WindowEvent.WINDOW_CLOSING));
-                break;
-            case BET:
-                if (roundPhase == RoundPhase.INITIAL_BET) {
-                    JButton chipButton = (JButton) e.getSource();
-                    int value = Integer.parseInt(chipButton.getName());
-                    placeBet(value);
-                }
-                break;
-            case RESET_BET:
-                if (roundPhase == RoundPhase.INITIAL_BET) {
-                    requestSender.sendRequest(new ClientRequest.Builder(Command.RESET_BET, activePlayer.getId()).build());
-                }
-                break;
-            case HIT:
-                requestCard();
-                break;
-            case STAND:
-                passTurn();
-                break;
-            case DOUBLE:
-                doubleBet();
-                break;
-            default:
-                break;
+        try {
+            switch (action) {
+                case QUIT_GAME:
+                    view.dispatchEvent(new WindowEvent(view, WindowEvent.WINDOW_CLOSING));
+                    break;
+                case BET:
+                    if (roundPhase == RoundPhase.INITIAL_BET) {
+                        JButton chipButton = (JButton) e.getSource();
+                        int value = Integer.parseInt(chipButton.getName());
+                        placeBet(value);
+                    }
+                    break;
+                case RESET_BET:
+                    if (roundPhase == RoundPhase.INITIAL_BET) {
+                        requestSender.sendRequest(new ClientRequest.Builder(Command.RESET_BET, activePlayer.getId()).build());
+                    }
+                    break;
+                case HIT:
+                    requestCard();
+                    break;
+                case STAND:
+                    passTurn();
+                    break;
+                case DOUBLE:
+                    doubleBet();
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception ex) {
+            System.out.println("Unfortunately, you are not connected to the black jack server. Close this client and try again.");
         }
     }
 
@@ -161,13 +166,17 @@ class ClientController implements StateListener, ActionListener {
     }
 
     private void quitGame() {
-        // Confirms whether the user want to quit the game
-        int input = JOptionPane.showConfirmDialog(view, "Do you want to quit the game?");
-        if (input == 0) {
-            // Sends out a quit request to the server
-            requestSender.sendRequest(new ClientRequest.Builder(Command.QUIT, activePlayer.getId()).build());
-            // Exit the application
-            System.exit(0);
+        try {
+            // Confirms whether the user want to quit the game
+            int input = JOptionPane.showConfirmDialog(view, "Do you want to quit the game?");
+            if (input == 0) {
+                // Sends out a quit request to the server
+                requestSender.sendRequest(new ClientRequest.Builder(Command.QUIT, activePlayer.getId()).build());
+                // Exit the application
+                System.exit(0);
+            }
+        } catch (Exception e) {
+            System.out.println("It seems you are no longer connected to the server. Kill the process to exit.");
         }
     }
 

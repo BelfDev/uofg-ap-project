@@ -15,7 +15,9 @@ class BlackJackProtocol implements ApplicationProtocol {
 
         switch (request.getCommand()) {
             case JOIN:
-                gameState.addNewPlayer();
+                if (gameState.getNumberOfPlayers() <= Configs.MAX_NUMBER_OF_PLAYERS) {
+                    gameState.addNewPlayer();
+                }
                 break;
             case QUIT:
                 gameState.removePlayer(request.getPlayerId());

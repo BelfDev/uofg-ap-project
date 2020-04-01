@@ -40,7 +40,7 @@ public class ResponseWorker extends SwingWorker<Void, Void> {
                 System.out.println(serverResponse);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("You are not connected to the black jack server.");
         }
         return null;
     }

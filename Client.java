@@ -1,6 +1,3 @@
-import java.io.IOException;
-import java.net.Socket;
-
 /**
  * Client application entry point. Connects to the game Server and allows the
  * user to play a BlackJack game.
