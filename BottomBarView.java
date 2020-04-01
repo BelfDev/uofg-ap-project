@@ -109,6 +109,8 @@ class BottomBarView extends JPanel {
         quitButton.setFont(customizedFont);
         quitButton.setForeground(Color.red);
 
+        quitButton.setActionCommand(ClientActionType.QUIT_GAME.toString());
+
         container.add(quitButton);
 
         return container;
@@ -128,9 +130,13 @@ class BottomBarView extends JPanel {
 
         // Creates the action buttons
         hitButton = createActionButton("HIT");
+        hitButton.setActionCommand(ClientActionType.HIT.toString());
         standButton = createActionButton("STAND");
+        standButton.setActionCommand(ClientActionType.STAND.toString());
         doubleButton = createActionButton("DOUBLE");
+        doubleButton.setActionCommand(ClientActionType.DOUBLE.toString());
         resetBetButton = createActionButton("RESET\nBET");
+        resetBetButton.setActionCommand(ClientActionType.RESET_BET.toString());
 
         final int buttonMargin = 16;
         buttonsContainer.add(hitButton);

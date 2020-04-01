@@ -1,17 +1,28 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+/**
+ * This class encapsulates the application main window and content.
+ * It provides a single source that exposes methods to manipulate
+ * the TopBar, BJTable, and BottomBar views.
+ */
 class ClientView extends JFrame {
 
     private TopBarView topBar;
     private BJTableView mainContent;
     private BottomBarView bottomBar;
 
+    // Map to efficiently manipulate PlayerViews
     private Map<Integer, PlayerView> playerViewMap;
 
+    /**
+     * Constructs the client view with a TopBarView, BJTableView, and BottomBarView.
+     */
     public ClientView() {
         setupWindow();
         setupPanels();
@@ -19,6 +30,8 @@ class ClientView extends JFrame {
 
         this.playerViewMap = new HashMap<>();
     }
+
+    // GETTERS
 
     public Map<Integer, PlayerView> getPlayerViewMap() {
         return playerViewMap;
@@ -28,18 +41,7 @@ class ClientView extends JFrame {
         return mainContent.getDealerView();
     }
 
-    public void disableDoubleButton(boolean disable) {
-        bottomBar.getDoubleButton().setEnabled(!disable);
-    }
-
-    public void disableResetBetButton(boolean disable) {
-        bottomBar.getResetBetButton().setEnabled(!disable);
-    }
-
-    public void disableHitAndStand(boolean disable) {
-        bottomBar.getHitButton().setEnabled(!disable);
-        bottomBar.getStandButton().setEnabled(!disable);
-    }
+    // SETTERS
 
     public void setBalance(String balance) {
         topBar.setBalanceValue(balance);
@@ -49,10 +51,72 @@ class ClientView extends JFrame {
         topBar.setFeedback(feedback);
     }
 
+    // BUTTONS
+
+    /**
+     * Deactivates the double button.
+     *
+     * @param disable boolean flag indicating whether to disable the button.
+     */
+    public void disableDoubleButton(boolean disable) {
+        bottomBar.getDoubleButton().setEnabled(!disable);
+    }
+
+    /**
+     * Deactivates the reset bet button.
+     *
+     * @param disable boolean flag indicating whether to disable the button.
+     */
+    public void disableResetBetButton(boolean disable) {
+        bottomBar.getResetBetButton().setEnabled(!disable);
+    }
+
+    /**
+     * Deactivates the hit and stand buttons.
+     *
+     * @param disable boolean flag indicating whether to disable the buttons.
+     */
+    public void disableHitAndStand(boolean disable) {
+        bottomBar.getHitButton().setEnabled(!disable);
+        bottomBar.getStandButton().setEnabled(!disable);
+    }
+
+    /**
+     * Adds action listeners to the view buttons.
+     *
+     * @param listener a listener to handle actions coming from all view buttons.
+     *                 Namely: quit, chips, hit, stand, double, and reset bet buttons.
+     */
+    public void setActionListener(ActionListener listener) {
+        List<JButton> buttons = Arrays.asList(
+                bottomBar.getQuitButton(),
+                bottomBar.getHitButton(),
+                bottomBar.getStandButton(),
+                bottomBar.getDoubleButton(),
+                bottomBar.getResetBetButton());
+
+        buttons.forEach(b -> b.addActionListener(listener));
+        setBetListeners(listener);
+    }
+
+    // PLAYERS
+
+    /**
+     * Updates the message displayed on the "Number of Players" panel.
+     *
+     * @param numberOfPlayers number of players currently in the game room.
+     */
     public void updateNumberOfPlayersLabel(String numberOfPlayers) {
         topBar.setPlayersValueLabelText(numberOfPlayers);
     }
 
+    /**
+     * Creates a new PlayerView and adds to the table.
+     *
+     * @param name the player's name.
+     * @param slot the slot number
+     * @return the added PlayerView.
+     */
     public PlayerView addNewPlayer(String name, int slot) {
         PlayerView playerView = mainContent.addPlayer(name, slot);
         if (playerView != null) {
@@ -61,40 +125,17 @@ class ClientView extends JFrame {
         return playerView;
     }
 
+    /**
+     * Removes the PlayerView which belongs to the given slot.
+     *
+     * @param slot the slot to be emptied.
+     */
     public void removePlayer(int slot) {
         mainContent.removePlayer(slot);
         playerViewMap.remove(slot);
     }
 
-    public void setActionListener(ActionListener listener) {
-        JButton quitButton = bottomBar.getQuitButton();
-        quitButton.setActionCommand(ClientActionType.QUIT_GAME.toString());
-        quitButton.addActionListener(listener);
-
-        setBetListeners(listener);
-
-        JButton hitButton = bottomBar.getHitButton();
-        hitButton.setActionCommand(ClientActionType.HIT.toString());
-        hitButton.addActionListener(listener);
-
-        JButton standButton = bottomBar.getStandButton();
-        standButton.setActionCommand(ClientActionType.STAND.toString());
-        standButton.addActionListener(listener);
-
-        JButton doubleButton = bottomBar.getDoubleButton();
-        doubleButton.setActionCommand(ClientActionType.DOUBLE.toString());
-        doubleButton.addActionListener(listener);
-
-        JButton resetBetButton = bottomBar.getResetBetButton();
-        resetBetButton.setActionCommand(ClientActionType.RESET_BET.toString());
-        resetBetButton.addActionListener(listener);
-    }
-
-    public void setBet(int value, int playerSlot) {
-        String betValue = String.valueOf(value);
-        PlayerView playerView = playerViewMap.get(playerSlot);
-        playerView.setBetValue(betValue);
-    }
+    // CONVENIENCE METHODS
 
     private void setupWindow() {
         // Sets the initial window size (golden ratio)
@@ -118,6 +159,7 @@ class ClientView extends JFrame {
     }
 
     private void setBetListeners(ActionListener listener) {
+        // Adds the listener to all chip buttons
         bottomBar.getChipButtons().forEach(chip -> {
             chip.setActionCommand(ClientActionType.BET.toString());
             chip.addActionListener(listener);

@@ -27,6 +27,7 @@ class ClientApp implements RequestSender {
         ClientView view = new ClientView();
         ClientController controller = new ClientController(view, this);
         broadcaster.addListener(controller);
+
         connectToServer();
     }
 
