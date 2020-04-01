@@ -64,7 +64,8 @@ class ClientController implements StateListener, ActionListener {
             if (activePlayer.isPush()) {
                 feedback = "It's a draw! You don't lose anything.";
             } else {
-                feedback = activePlayer.isWinner() ? "You win! " : "And the Dealer takes it all!";
+                feedback = activePlayer.isWinner() ? "You win! " : "The Dealer takes it all! ";
+                feedback += " The round will restart shortly.";
             }
         }
         view.setFeedback(feedback);
@@ -116,9 +117,10 @@ class ClientController implements StateListener, ActionListener {
     }
 
     private void placeBet(int value) {
-        int newRoundBet = activePlayer.getRoundBet() + value;
         double balance = activePlayer.getBalance();
-        if (newRoundBet <= balance) {
+        if (value == 0) {
+            view.setFeedback("You must bet something!");
+        } else if ((balance - value) >= 0) {
             activePlayer.increaseRoundBet(value);
             requestSender.sendRequest(new ClientRequest.Builder(Command.BET, activePlayer.getId())
                     .withData("bet", value)

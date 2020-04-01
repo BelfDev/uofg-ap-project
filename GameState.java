@@ -5,8 +5,8 @@ import java.util.stream.Collectors;
 
 public class GameState implements Serializable {
 
-    public static final String AWAITING_PLAYER_MESSAGE = "Awaiting for player in slot ";
-    private static final String AWAITING_FOR_BETS = "Please place your bets.";
+    public static final String AWAITING_PLAYER_MESSAGE = "Waiting for player in slot ";
+    private static final String AWAITING_FOR_BETS = "Please place your bets. Hit to confirm.";
 
     private AtomicReference<RoundPhase> roundPhase;
     // Indicates the game bottleneck (i.e. which player everyone is waiting for)
@@ -25,7 +25,7 @@ public class GameState implements Serializable {
         this.dealer = new AtomicReference<>(new Dealer());
         this.bottleneck = new AtomicReference<>(null);
         this.deck = PlayingCardFactory.getPlayingCardsDeck();
-        this.feedbackText = new AtomicReference<>("Welcome to the Black Jack game!");
+        this.feedbackText = new AtomicReference<>(AWAITING_FOR_BETS);
     }
 
     public synchronized int getNumberOfPlayers() {
@@ -138,6 +138,8 @@ public class GameState implements Serializable {
     }
 
     public synchronized void dealInitialCards() {
+        // Reshuffles the deck
+        this.deck = PlayingCardFactory.getPlayingCardsDeck();
         // Deals the initial dealer cards
         Dealer d = dealer.get();
         d.addCard(deck.pop());
@@ -169,18 +171,18 @@ public class GameState implements Serializable {
                 setFeedbackText(AWAITING_FOR_BETS);
                 break;
             case PLAYER_ACTION:
-                setFeedbackText(AWAITING_PLAYER_MESSAGE + bottleneck.get().getSlot());
+                setFeedbackText(AWAITING_PLAYER_MESSAGE + bottleneck.get().getSlot() + ".");
         }
     }
 
     @Override
     public String toString() {
         return "GameState{" +
-                "\nnumberOfPlayers=" + getNumberOfPlayers() +
-                ",\nroundPhase=" + roundPhase +
-                ",\nplayerMap=" + playerMap +
-                ",\navailableSlots=" + availableSlots +
+                "\n roundPhase=" + roundPhase +
+                ",\n availableSlots=" + availableSlots +
+                ",\n bottleneck=" + bottleneck +
+                ",\n numberOfPlayers=" + getPlayers().size()+
+                ",\n feedbackText=" + feedbackText +
                 '}';
     }
-
 }

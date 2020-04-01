@@ -33,13 +33,7 @@ class BlackJackProtocol implements ApplicationProtocol {
             case HIT:
                 if (requestRoundPhase.equals(RoundPhase.INITIAL_BET)) {
                     passTurn(requestPlayer.getId(), requestRoundPhase);
-//                    requestPlayer.setIsBottleneck(false);
-//                    if (gameState.getBottlenecks().isEmpty()) {
-//                        gameState.advanceRound();
-//                        gameState.dealInitialCards();
-//                        gameState.setFeedbackText(AWAITING_PLAYER_MESSAGE + gameState.getBottleneck().getSlot());
-//                    }
-                } else if (requestPlayer.isBottleneck() && requestPlayer.getHandScore() < 21) {
+                } else if (gameState.getBottleneck().getId().equals(requestPlayer.getId()) && requestPlayer.getHandScore() < 21) {
                     // Deals a card
                     PlayingCard card = gameState.dealCard();
                     requestPlayer.addCard(card);
@@ -86,6 +80,7 @@ class BlackJackProtocol implements ApplicationProtocol {
                 gameState.dealInitialCards();
             }
         } else if (requestRoundPhase.equals(RoundPhase.PLAYER_ACTION)) {
+            gameState.setBottleneck(gameState.getNextBottleneck());
             gameState.setFeedbackText(GameState.AWAITING_PLAYER_MESSAGE + gameState.getNextBottleneck().getSlot());
         }
     }
@@ -136,7 +131,7 @@ class BlackJackProtocol implements ApplicationProtocol {
                     // This is a draw (push)
                     player.setIsPush(true);
                     player.setBalance(previousBalance + player.getRoundBet());
-                } else {
+                } else if (playerScore <= 21 && dealerScore > 21) {
                     // The dealer busted
                     player.setIsWinner(true);
                     player.setBalance(previousBalance + player.getRoundBet() * 2);
