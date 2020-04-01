@@ -35,30 +35,11 @@ class BlackJackProtocol implements ApplicationProtocol {
                     passTurn(requestPlayer.getId(), requestRoundPhase);
                 } else if (gameState.getBottleneck().getId().equals(requestPlayer.getId()) && requestPlayer.getHandScore() < 21) {
                     // Deals a card
-                    PlayingCard card = gameState.dealCard();
-                    requestPlayer.addCard(card);
-                    // Evaluates new card score
-                    if (requestPlayer.getHandScore() > 21) {
-                        // Request player lost on this turn
-                        // Updates the request player state
-                        requestPlayer.setIsEliminated(true);
-                        requestPlayer.setIsBottleneck(false);
-                        requestPlayer.resetRoundBet();
-                        // Updates the overall game state
-                        Player nextBottleneck = gameState.getNextBottleneck();
-                        // If there are any bottlenecks
-                        if (nextBottleneck != null) {
-                            gameState.setBottleneck(nextBottleneck);
-                            gameState.setFeedbackText(GameState.AWAITING_PLAYER_MESSAGE + nextBottleneck.getSlot());
-                        } else {
-                            // If there are no more bottlenecks
-                            gameState.advanceRound();
-                        }
-                    }
+                    dealOneCard(requestPlayer, requestRoundPhase);
 
-                    if (gameState.getEliminatedPlayers().size() == Configs.MAX_NUMBER_OF_PLAYERS) {
-                        gameState.advanceRound();
-                    }
+//                    if (gameState.getEliminatedPlayers().size() == Configs.MAX_NUMBER_OF_PLAYERS) {
+//                        gameState.advanceRound();
+//                    }
                 }
                 updateDealerIfNeeded();
                 break;
@@ -66,9 +47,37 @@ class BlackJackProtocol implements ApplicationProtocol {
                 passTurn(requestPlayer.getId(), requestRoundPhase);
                 updateDealerIfNeeded();
                 break;
+            case DOUBLE_DOWN:
+                if (gameState.getBottleneck().getId().equals(requestPlayer.getId())) {
+                    int currentBet = requestPlayer.getRoundBet();
+                    double balance = requestPlayer.getBalance();
+
+                    requestPlayer.increaseRoundBet(currentBet);
+                    requestPlayer.setBalance(balance - currentBet);
+
+                    dealOneCard(requestPlayer, requestRoundPhase);
+                    if (gameState.getRoundPhase().equals(RoundPhase.PLAYER_ACTION)) {
+                        passTurn(requestPlayer.getId(), requestRoundPhase);
+                    }
+                    updateDealerIfNeeded();
+                }
         }
 
         return new ServerResponse(ResponseStatus.OK, gameState);
+    }
+
+    private void dealOneCard(Player requestPlayer, RoundPhase requestRoundPhase) {
+        PlayingCard card = gameState.dealCard();
+        requestPlayer.addCard(card);
+        // Evaluates new card score
+        if (requestPlayer.getHandScore() > 21) {
+            // Request player lost on this turn
+            // Updates the request player state
+            requestPlayer.setIsEliminated(true);
+            requestPlayer.resetRoundBet();
+            // If there are any bottlenecks
+            passTurn(requestPlayer.getId(), requestRoundPhase);
+        }
     }
 
     private void passTurn(String requestPlayerId, RoundPhase requestRoundPhase) {
@@ -82,6 +91,8 @@ class BlackJackProtocol implements ApplicationProtocol {
         } else if (requestRoundPhase.equals(RoundPhase.PLAYER_ACTION)) {
             gameState.setBottleneck(gameState.getNextBottleneck());
             gameState.setFeedbackText(GameState.AWAITING_PLAYER_MESSAGE + gameState.getNextBottleneck().getSlot());
+        } else if (gameState.getEliminatedPlayers().size() == Configs.MAX_NUMBER_OF_PLAYERS) {
+            gameState.advanceRound();
         }
     }
 

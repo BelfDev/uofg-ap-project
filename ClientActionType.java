@@ -1,3 +1,3 @@
 public enum ClientActionType {
-    QUIT_GAME, HIT, BET, STAND;
+    QUIT_GAME, HIT, BET, STAND, DOUBLE;
 }

@@ -15,6 +15,7 @@ class ClientController implements StateListener, ActionListener {
     private List<Player> playerList;
 
     private RoundPhase roundPhase;
+    private boolean isBetDoubled;
 
     public ClientController(ClientView view, RequestSender requestSender) {
         this.view = view;
@@ -22,6 +23,7 @@ class ClientController implements StateListener, ActionListener {
         this.activePlayer = null;
         this.playerList = null;
         this.roundPhase = null;
+        this.isBetDoubled = false;
         view.setActionListener(this);
         view.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -107,8 +109,21 @@ class ClientController implements StateListener, ActionListener {
                 break;
             case STAND:
                 passTurn();
+                break;
+            case DOUBLE:
+                doubleBet();
+                break;
             default:
                 break;
+        }
+    }
+
+    private void doubleBet() {
+        double balance = activePlayer.getBalance();
+        int roundBet = activePlayer.getRoundBet();
+        if (!isBetDoubled && roundPhase.equals(RoundPhase.PLAYER_ACTION) && roundBet > 0 && (balance - roundBet * 2) >= 0) {
+            requestSender.sendRequest(new ClientRequest.Builder(Command.DOUBLE_DOWN, activePlayer.getId()).build());
+            isBetDoubled = true;
         }
     }
 
@@ -125,6 +140,7 @@ class ClientController implements StateListener, ActionListener {
             requestSender.sendRequest(new ClientRequest.Builder(Command.BET, activePlayer.getId())
                     .withData("bet", value)
                     .build());
+            isBetDoubled = false;
         } else {
             view.setFeedback("You don't have enough credits to place this bet!");
         }
@@ -142,7 +158,7 @@ class ClientController implements StateListener, ActionListener {
     }
 
     private void requestCard() {
-        if (!activePlayer.isEliminated() && activePlayer.getRoundBet() > 0) {
+        if (!isBetDoubled && !activePlayer.isEliminated() && activePlayer.getRoundBet() > 0) {
             requestSender.sendRequest(new ClientRequest.Builder(Command.HIT, activePlayer.getId()).build());
         }
 
