@@ -81,6 +81,7 @@ public class GameState implements Serializable {
         String playerId = UUID.randomUUID().toString();
         Integer slot = availableSlots.pop();
         Player player = new Player(playerId, slot);
+        player.setIsBottleneck(roundPhase.get().equals(RoundPhase.INITIAL_BET));
         playerMap.put(playerId, player);
     }
 
@@ -181,7 +182,7 @@ public class GameState implements Serializable {
                 "\n roundPhase=" + roundPhase +
                 ",\n availableSlots=" + availableSlots +
                 ",\n bottleneck=" + bottleneck +
-                ",\n numberOfPlayers=" + getPlayers().size()+
+                ",\n numberOfPlayers=" + getPlayers().size() +
                 ",\n feedbackText=" + feedbackText +
                 '}';
     }

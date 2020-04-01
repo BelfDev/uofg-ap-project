@@ -142,8 +142,7 @@ class ClientController implements StateListener, ActionListener {
     }
 
     private void requestCard() {
-        // TODO: Create hit request
-        if (!activePlayer.isEliminated()) {
+        if (!activePlayer.isEliminated() && activePlayer.getRoundBet() > 0) {
             requestSender.sendRequest(new ClientRequest.Builder(Command.HIT, activePlayer.getId()).build());
         }
 

@@ -15,6 +15,7 @@ public class Player implements Serializable {
     private AtomicInteger roundBet;
     private AtomicBoolean isBottleneck;
     private AtomicInteger handScore;
+
     private AtomicBoolean isEliminated;
     private AtomicBoolean isWinner;
     private AtomicBoolean isPush;
