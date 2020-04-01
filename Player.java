@@ -6,11 +6,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+
+/**
+ * This class is a thread safe model representation of the Player entity.
+ * It also provides a few methods for conveniently modifying its state.
+ */
 public class Player implements Serializable {
 
     private final AtomicReference<String> id;
     private final AtomicInteger slot;
 
+    private List<PlayingCard> cards;
     private AtomicReference<Double> balance;
     private AtomicInteger roundBet;
     private AtomicBoolean isBottleneck;
@@ -22,8 +28,12 @@ public class Player implements Serializable {
 
     private AtomicInteger numberOfElevenAces;
 
-    private List<PlayingCard> cards;
-
+    /**
+     * Constructs the player model.
+     *
+     * @param id   an unique identifier String.
+     * @param slot the table slot where the player should be placed in.
+     */
     public Player(String id, Integer slot) {
         this.id = new AtomicReference<>(id);
         this.slot = new AtomicInteger(slot);
@@ -38,6 +48,8 @@ public class Player implements Serializable {
         this.isWinner = new AtomicBoolean(false);
     }
 
+    // GETTERS
+
     public String getId() {
         return id.get();
     }
@@ -46,40 +58,42 @@ public class Player implements Serializable {
         return slot.get();
     }
 
-    public boolean isWinner() {
-        return isWinner.get();
-    }
-
-    public boolean isPush() {
-        return isPush.get();
+    public double getBalance() {
+        return balance.get();
     }
 
     public int getRoundBet() {
         return roundBet.get();
     }
 
+    public boolean isBottleneck() {
+        return isBottleneck.get();
+    }
+
     public int getHandScore() {
         return handScore.get();
-    }
-
-    public double getBalance() {
-        return balance.get();
-    }
-
-    public boolean isEliminated() {
-        return isEliminated.get();
     }
 
     public List<PlayingCard> getCards() {
         return cards;
     }
 
-    public void setBalance(double balance) {
-        this.balance.set(balance);
+    public boolean isEliminated() {
+        return isEliminated.get();
     }
 
-    public boolean isBottleneck() {
-        return isBottleneck.get();
+    public boolean isPush() {
+        return isPush.get();
+    }
+
+    public boolean isWinner() {
+        return isWinner.get();
+    }
+
+    // SETTERS
+
+    public void setBalance(double balance) {
+        this.balance.set(balance);
     }
 
     public void increaseRoundBet(int value) {
@@ -106,6 +120,8 @@ public class Player implements Serializable {
         this.isWinner.set(isWinner);
     }
 
+    // OPERATIONS
+
     public synchronized void addCard(PlayingCard card) {
         int score = calculateScore(card);
         this.handScore.getAndAdd(score);
@@ -116,6 +132,8 @@ public class Player implements Serializable {
         this.handScore.set(0);
         this.cards = Collections.synchronizedList(new ArrayList<>());
     }
+
+    // CONVENIENCE METHODS
 
     private int calculateScore(PlayingCard card) {
         int score = this.handScore.get();
@@ -131,7 +149,6 @@ public class Player implements Serializable {
         } else {
             score = Integer.parseInt(card.getValue());
         }
-
         // Corrects the value of Aces if necessary
         return correctAceValueIfNeeded(score);
     }
@@ -151,6 +168,7 @@ public class Player implements Serializable {
 
     @Override
     public String toString() {
+        // Simplified description of a Player
         return "Player{" +
                 "id=" + id.get() +
                 ", slot=" + slot.get() +
