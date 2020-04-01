@@ -1,9 +1,20 @@
 import java.util.List;
 
+/**
+ * This class encapsulates the application protocol guidelines for
+ * communication between client-server and the processing of requests.
+ * The protocol receives a client request, interprets it according to
+ * game rules, and outputs a server response containing a new game new state.
+ */
 class BlackJackProtocol implements ApplicationProtocol {
 
     private GameState gameState;
 
+    /**
+     * Constructs the black jack application protocol.
+     *
+     * @param gameState the shared game state.
+     */
     public BlackJackProtocol(GameState gameState) {
         this.gameState = gameState;
     }
@@ -12,68 +23,104 @@ class BlackJackProtocol implements ApplicationProtocol {
     public synchronized ServerResponse processInput(ClientRequest request) {
         Player requestPlayer = gameState.getPlayer(request.getPlayerId());
         RoundPhase requestRoundPhase = gameState.getRoundPhase();
-
+        // Checks which command has been issued
         switch (request.getCommand()) {
             case JOIN:
-                if (gameState.getNumberOfPlayers() <= Configs.MAX_NUMBER_OF_PLAYERS) {
-                    gameState.addNewPlayer();
-                }
+                addNewPlayer();
                 break;
             case QUIT:
-                gameState.removePlayer(request.getPlayerId());
-                System.out.println(String.format("Player %s has left the game", request.getPlayerId()));
-                if (requestRoundPhase.equals(RoundPhase.PLAYER_ACTION)) {
-                    Player bottleneck = gameState.getNextBottleneck();
-                    gameState.setFeedbackText(GameState.AWAITING_PLAYER_MESSAGE + bottleneck.getSlot());
-                }
+                removePlayer(request, requestRoundPhase);
                 break;
             case BET:
-                int newBet = (Integer) request.getPayload().get("bet");
-                requestPlayer.increaseRoundBet(newBet);
-                requestPlayer.setBalance(requestPlayer.getBalance() - newBet);
+                updateBet(request, requestPlayer);
                 break;
             case HIT:
-                if (requestRoundPhase.equals(RoundPhase.INITIAL_BET)) {
-                    passTurn(requestPlayer.getId(), requestRoundPhase);
-                } else if (gameState.getBottleneck().getId().equals(requestPlayer.getId()) && requestPlayer.getHandScore() < 21) {
-                    // Deals a card
-                    dealOneCard(requestPlayer, requestRoundPhase);
-                }
-                updateDealerIfNeeded();
+                handleHitAction(requestPlayer, requestRoundPhase);
                 break;
             case STAND:
-                if (gameState.getBottleneck().getId().equals(requestPlayer.getId())) {
-                    passTurn(requestPlayer.getId(), requestRoundPhase);
-                    updateDealerIfNeeded();
-                }
+                handleStandAction(requestPlayer, requestRoundPhase);
                 break;
             case DOUBLE_DOWN:
-                if (gameState.getBottleneck().getId().equals(requestPlayer.getId())) {
-                    int currentBet = requestPlayer.getRoundBet();
-                    double balance = requestPlayer.getBalance();
-
-                    requestPlayer.increaseRoundBet(currentBet);
-                    requestPlayer.setBalance(balance - currentBet);
-
-                    dealOneCard(requestPlayer, requestRoundPhase);
-                    if (gameState.getRoundPhase().equals(RoundPhase.PLAYER_ACTION)) {
-                        passTurn(requestPlayer.getId(), requestRoundPhase);
-                    }
-                    updateDealerIfNeeded();
-                }
+                handleDoubleDownAction(requestPlayer, requestRoundPhase);
                 break;
             case RESET_BET:
-                if (gameState.getRoundPhase().equals(RoundPhase.INITIAL_BET)) {
-                    double balance = requestPlayer.getBalance();
-                    int currentBet = requestPlayer.getRoundBet();
-                    requestPlayer.setBalance(balance + currentBet);
-                    requestPlayer.resetRoundBet();
-                }
+                resetBet(requestPlayer);
                 break;
         }
 
         return new ServerResponse(ResponseStatus.OK, gameState);
     }
+
+    // PROTOCOL PROCESSING
+
+    private void addNewPlayer() {
+        // Checks if the current number of players has reached the max
+        if (gameState.getNumberOfPlayers() <= Configs.MAX_NUMBER_OF_PLAYERS) {
+            // Adds a new player to the shared game state
+            gameState.addNewPlayer();
+        }
+    }
+
+    private void removePlayer(ClientRequest request, RoundPhase requestRoundPhase) {
+        // Remove a player who issued the QUIT command from the game
+        gameState.removePlayer(request.getPlayerId());
+        System.out.println(String.format("Player %s has left the game", request.getPlayerId()));
+        if (requestRoundPhase.equals(RoundPhase.PLAYER_ACTION)) {
+            // Updates the game state after the player has left
+            Player bottleneck = gameState.getNextBottleneck();
+            gameState.setFeedbackText(GameState.AWAITING_PLAYER_MESSAGE + bottleneck.getSlot());
+        }
+    }
+
+    private void updateBet(ClientRequest request, Player requestPlayer) {
+        // Updates the request player bet in the shared game state
+        int newBet = (Integer) request.getPayload().get("bet");
+        requestPlayer.increaseRoundBet(newBet);
+        requestPlayer.setBalance(requestPlayer.getBalance() - newBet);
+    }
+
+    private void handleHitAction(Player requestPlayer, RoundPhase requestRoundPhase) {
+        if (requestRoundPhase.equals(RoundPhase.INITIAL_BET)) {
+            passTurn(requestPlayer.getId(), requestRoundPhase);
+        } else if (gameState.getBottleneck().getId().equals(requestPlayer.getId()) && requestPlayer.getHandScore() < 21) {
+            dealOneCard(requestPlayer, requestRoundPhase);
+        }
+        updateDealerIfNeeded();
+    }
+
+    private void handleStandAction(Player requestPlayer, RoundPhase requestRoundPhase) {
+        if (gameState.getBottleneck().getId().equals(requestPlayer.getId())) {
+            passTurn(requestPlayer.getId(), requestRoundPhase);
+            updateDealerIfNeeded();
+        }
+    }
+
+    private void handleDoubleDownAction(Player requestPlayer, RoundPhase requestRoundPhase) {
+        if (gameState.getBottleneck().getId().equals(requestPlayer.getId())) {
+            int currentBet = requestPlayer.getRoundBet();
+            double balance = requestPlayer.getBalance();
+
+            requestPlayer.increaseRoundBet(currentBet);
+            requestPlayer.setBalance(balance - currentBet);
+
+            dealOneCard(requestPlayer, requestRoundPhase);
+            if (gameState.getRoundPhase().equals(RoundPhase.PLAYER_ACTION)) {
+                passTurn(requestPlayer.getId(), requestRoundPhase);
+            }
+            updateDealerIfNeeded();
+        }
+    }
+
+    private void resetBet(Player requestPlayer) {
+        if (gameState.getRoundPhase().equals(RoundPhase.INITIAL_BET)) {
+            double balance = requestPlayer.getBalance();
+            int currentBet = requestPlayer.getRoundBet();
+            requestPlayer.setBalance(balance + currentBet);
+            requestPlayer.resetRoundBet();
+        }
+    }
+
+    // OPERATIONS
 
     private void dealOneCard(Player requestPlayer, RoundPhase requestRoundPhase) {
         PlayingCard card = gameState.dealCard();
@@ -135,9 +182,6 @@ class BlackJackProtocol implements ApplicationProtocol {
             boolean dealerHasTwentyOneSum = !dealerHasBlackJack && dealerScore == 21;
             boolean playerHasHigherScore = playerScore > dealerScore && dealerScore < 21;
 
-            System.out.println("\n\n PLAYER SCORE:");
-            System.out.println(playerScore);
-
             if (playerHasHigherScore || (playerHasBlackJack && dealerHasTwentyOneSum)) {
                 // Sets the player as a winner
                 player.setIsWinner(true);
@@ -157,13 +201,6 @@ class BlackJackProtocol implements ApplicationProtocol {
                 player.setIsWinner(true);
                 player.setBalance(previousBalance + player.getRoundBet() * 2);
             }
-
-            System.out.println("\n\n PLAYER STATUS:");
-            System.out.println("\n WIN?");
-            System.out.println(player.isWinner());
-            System.out.println("\n DRAW?");
-            System.out.println(player.isPush());
-
             // Resets the round bet
             player.resetRoundBet();
         });
