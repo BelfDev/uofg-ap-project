@@ -1,3 +1,6 @@
+/**
+ * This model class represents the Dealer entity.
+ */
 public class Dealer extends Player {
 
     public Dealer() {

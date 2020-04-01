@@ -2,6 +2,10 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This class encapsulates several static constants that
+ * configure the black jack game dynamics and appearance.
+ */
 class Configs {
 
     public static final int MAX_NUMBER_OF_PLAYERS = 5;
@@ -44,7 +48,7 @@ class Configs {
 
     // Player model
     public static final double PLAYER_INITIAL_BALANCE = 1000;
-    
+
     private Configs() {
     }
 }
