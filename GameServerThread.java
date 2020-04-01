@@ -54,14 +54,16 @@ class GameServerThread extends Thread implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
+        // This method is automatically triggered when there are changes to observables
         BlackJackService origin = (BlackJackService) o;
         ServerResponse response = (ServerResponse) arg;
-        // Triggers the transmission of the response in all live services
+        // Transmits the generated response to all live services
         for (BlackJackService service : services) {
             if (service != null && service.isAlive()) {
                 service.transmitMessage(response);
             }
         }
+        // Tears down legacy services and connections
         if (!origin.isAlive()) {
             services.remove(origin);
             numberOfClients--;
